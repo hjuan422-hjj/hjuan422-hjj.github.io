@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测验生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            margin: 10px 0;
+            resize: vertical;
+            min-height: 150px;
+            font-family: monospace;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: block;
+            width: 100%;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .file-input-label:hover {
+            background: #5568d3;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .input-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: #e8eaf6;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .import-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .import-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .quiz-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .quiz-list-title {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .quiz-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .quiz-item-name {
+            font-weight: bold;
+            color: #333;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .quiz-item-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .question-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: #e8eaf6;
+        }
+
+        .option.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .option.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .result-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 15px 0;
+            font-size: 18px;
+        }
+
+        .result-correct {
+            background: #28a745;
+            color: white;
+        }
+
+        .result-wrong {
+            background: #dc3545;
+            color: white;
+        }
+
+        .explanation {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .progress {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .quiz-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn:hover {
+            background: #5568d3;
+            transform: scale(1.1);
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .nav-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            background: #5568d3;
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .score {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .quiz-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .quiz-item-buttons {
+                margin-top: 10px;
+                width: 100%;
+            }
+
+            .btn {
+                font-size: 14px;
+                padding: 10px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 测验生成器</h1>
+
+        <!-- Home Screen -->
+        <div id="homeScreen" class="screen active">
+            <div class="import-section">
+                <h2>导入新测验</h2>
+                
+                <div class="input-tabs">
+                    <button class="tab-btn active" onclick="switchTab('file')">上传 CSV 文件</button>
+                    <button class="tab-btn" onclick="switchTab('paste')">粘贴 CSV 内容</button>
+                </div>
+
+                <div id="fileTab" class="tab-content active">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="csvFile" accept=".csv" onchange="updateFileName()">
+                        <label for="csvFile" class="file-input-label">📁 选择 CSV 文件</label>
+                    </div>
+                    <div id="fileName" class="file-name"></div>
+                </div>
+
+                <div id="pasteTab" class="tab-content">
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+                        <button class="btn btn-small btn-success" onclick="copyPrompt()">📋 复制 AI 提示词</button>
+                    </div>
+                    <textarea id="csvContent" placeholder="在此粘贴您的 CSV 内容...&#10;示例：&#10;2+2等于几?,3,4,5,6,2,因为2加2等于4&#10;天空是什么颜色的?,红色,蓝色,绿色,黄色,2,天空看起来是蓝色的"></textarea>
+                </div>
+
+                <input type="text" id="quizName" placeholder="输入测验名称">
+                <button class="btn" onclick="importQuiz()">导入测验</button>
+            </div>
+
+            <div id="quizListContainer">
+                <h3 class="quiz-list-title">我的测验</h3>
+                <ul id="quizList" class="quiz-list"></ul>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quizScreen" class="screen">
+            <div class="quiz-header">
+                <div class="progress" id="progress"></div>
+                <div class="quiz-controls">
+                    <button class="icon-btn" onclick="restartCurrentQuiz()" title="重来">↻</button>
+                    <button class="icon-btn" onclick="shuffleAndRestart()" title="打乱并重来">🔀</button>
+                </div>
+            </div>
+            <div class="question-card" id="questionCard"></div>
+            <div class="navigation-buttons">
+                <button class="nav-btn" id="prevBtn" onclick="previousQuestion()">
+                    ← 上一题
+                </button>
+                <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">
+                    下一题 →
+                </button>
+            </div>
+            <div style="text-align:center; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="showHome()">返回主页</button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="resultsScreen" class="screen">
+            <h2 style="text-align:center;margin-bottom:20px;">测验完成！</h2>
+            <div class="score" id="finalScore"></div>
+            <div style="text-align:center;">
+                <button class="btn" onclick="restartQuiz()">重新测验</button>
+                <button class="btn btn-secondary" onclick="showHome()">返回主页</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let quizzes = {};
+        let currentQuiz = null;
+        let currentQuizName = null;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answeredQuestions = {}; // Track which questions have been answered correctly
+        let activeTab = 'file'; // Track active input tab
+
+        // Copy Prompt Function
+        function copyPrompt() {
+            const text = "请生成关于......的选择题，并以CSV格式显示。第一列是问题。第二到第五列是选项1、2、3、4。第六列是正确答案的数字编号（1-4）。第七列是解释。";
+            
+            const textarea = document.createElement("textarea");
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                alert("提示词已复制！请在 AI 工具中将 '......' 替换为您的主题。");
+            } catch (err) {
+                console.error('Failed to copy', err);
+                prompt("请复制以下文本：", text);
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // Switch between file upload and paste tabs
+        function switchTab(tab) {
+            activeTab = tab;
+            const fileTabs = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
+
+            fileTabs.forEach(btn => btn.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+
+            if (tab === 'file') {
+                fileTabs[0].classList.add('active');
+                document.getElementById('fileTab').classList.add('active');
+            } else {
+                fileTabs[1].classList.add('active');
+                document.getElementById('pasteTab').classList.add('active');
+            }
+        }
+
+        // Update file name display
+        function updateFileName() {
+            const fileInput = document.getElementById('csvFile');
+            const fileNameDisplay = document.getElementById('fileName');
+            if (fileInput.files.length > 0) {
+                fileNameDisplay.textContent = `已选择: ${fileInput.files[0].name}`;
+            } else {
+                fileNameDisplay.textContent = '';
+            }
+        }
+
+        // Load quizzes from localStorage
+        function loadQuizzes() {
+            const stored = localStorage.getItem('quizzes');
+            if (stored) {
+                quizzes = JSON.parse(stored);
+            }
+        }
+
+        // Save quizzes to localStorage
+        function saveQuizzes() {
+            localStorage.setItem('quizzes', JSON.stringify(quizzes));
+        }
+
+        // Show screens
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function showHome() {
+            showScreen('homeScreen');
+            document.getElementById('csvFile').value = '';
+            document.getElementById('csvContent').value = '';
+            document.getElementById('quizName').value = '';
+            document.getElementById('fileName').textContent = '';
+            renderQuizList();
+        }
+
+        // Import quiz from CSV
+        function importQuiz() {
+            const nameInput = document.getElementById('quizName');
+            const name = nameInput.value.trim();
+
+            if (!name) {
+                alert('请输入测验名称');
+                return;
+            }
+
+            let csvText = '';
+
+            if (activeTab === 'file') {
+                const fileInput = document.getElementById('csvFile');
+                const file = fileInput.files[0];
+
+                if (!file) {
+                    alert('请选择一个 CSV 文件');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    csvText = e.target.result;
+                    processCSV(csvText, name);
+                };
+                reader.readAsText(file);
+            } else {
+                csvText = document.getElementById('csvContent').value.trim();
+
+                if (!csvText) {
+                    alert('请粘贴 CSV 内容');
+                    return;
+                }
+
+                processCSV(csvText, name);
+            }
+        }
+
+        // Process CSV text
+        function processCSV(text, name) {
+            const questions = parseCSV(text);
+            
+            if (questions.length === 0) {
+                alert('CSV 中未发现有效问题');
+                return;
+            }
+
+            quizzes[name] = questions;
+            saveQuizzes();
+            alert('测验导入成功！');
+            document.getElementById('csvFile').value = '';
+            document.getElementById('csvContent').value = '';
+            document.getElementById('quizName').value = '';
+            document.getElementById('fileName').textContent = '';
+            renderQuizList();
+        }
+
+        // Parse CSV with new structure
+        function parseCSV(text) {
+            const lines = text.split('\n').filter(line => line.trim());
+            const questions = [];
+
+            for (let i = 0; i < lines.length; i++) {
+                const cols = parseCSVLine(lines[i]);
+                if (cols.length >= 7) {
+                    const correctAnswer = parseInt(cols[5]);
+                    if (correctAnswer >= 1 && correctAnswer <= 4) {
+                        questions.push({
+                            question: cols[0],
+                            options: [cols[1], cols[2], cols[3], cols[4]],
+                            correctAnswer: correctAnswer - 1, // Convert to 0-based index
+                            explanation: cols[6] || ''
+                        });
+                    }
+                }
+            }
+
+            return questions;
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current.trim());
+            return result;
+        }
+
+        // Render quiz list
+        function renderQuizList() {
+            const list = document.getElementById('quizList');
+            list.innerHTML = '';
+
+            if (Object.keys(quizzes).length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <p>暂无测验。导入 CSV 文件开始吧！</p>
+                    </div>
+                `;
+                return;
+            }
+
+            for (const name in quizzes) {
+                const li = document.createElement('li');
+                li.className = 'quiz-item';
+                li.innerHTML = `
+                    <span class="quiz-item-name">${name} (${quizzes[name].length} 题)</span>
+                    <div class="quiz-item-buttons">
+                        <button class="btn btn-small" onclick="startQuiz('${name}')">开始</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteQuiz('${name}')">删除</button>
+                    </div>
+                `;
+                list.appendChild(li);
+            }
+        }
+
+        // Delete quiz
+        function deleteQuiz(name) {
+            if (confirm(`确定要删除测验 "${name}" 吗？`)) {
+                delete quizzes[name];
+                saveQuizzes();
+                renderQuizList();
+            }
+        }
+
+        // Start quiz
+        function startQuiz(name) {
+            currentQuiz = [...quizzes[name]]; // Create a copy
+            currentQuizName = name;
+            currentQuestionIndex = 0;
+            score = 0;
+            answeredQuestions = {};
+            showScreen('quizScreen');
+            renderQuestion();
+        }
+
+        // Shuffle array function
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Restart current quiz
+        function restartCurrentQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            answeredQuestions = {};
+            renderQuestion();
+        }
+
+        // Shuffle and restart
+        function shuffleAndRestart() {
+            currentQuiz = shuffleArray(currentQuiz);
+            currentQuestionIndex = 0;
+            score = 0;
+            answeredQuestions = {};
+            renderQuestion();
+        }
+
+        // Render question
+        function renderQuestion() {
+            const question = currentQuiz[currentQuestionIndex];
+            const card = document.getElementById('questionCard');
+            const progress = document.getElementById('progress');
+
+            progress.textContent = `第 ${currentQuestionIndex + 1} 题 / 共 ${currentQuiz.length} 题`;
+
+            let html = `<div class="question-text">${question.question}</div>`;
+            question.options.forEach((option, index) => {
+                html += `<div class="option" onclick="selectOption(${index})">${option}</div>`;
+            });
+
+            card.innerHTML = html;
+
+            // Update navigation buttons
+            updateNavigationButtons();
+
+            // If this question was already answered correctly, show the result
+            if (answeredQuestions[currentQuestionIndex]) {
+                const options = document.querySelectorAll('.option');
+                options[question.correctAnswer].classList.add('correct');
+                options.forEach(opt => {
+                    opt.style.cursor = 'default';
+                });
+
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'result-badge result-correct';
+                resultDiv.textContent = '✓ 回答正确！';
+                card.appendChild(resultDiv);
+
+                if (question.explanation) {
+                    const explanationDiv = document.createElement('div');
+                    explanationDiv.className = 'explanation';
+                    explanationDiv.innerHTML = `<strong>解释：</strong> ${question.explanation}`;
+                    card.appendChild(explanationDiv);
+                }
+            }
+        }
+
+        // Update navigation buttons
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            prevBtn.disabled = currentQuestionIndex === 0;
+            nextBtn.disabled = currentQuestionIndex === currentQuiz.length - 1;
+        }
+
+        // Previous question
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        }
+
+        // Next question
+        function nextQuestion() {
+            if (currentQuestionIndex < currentQuiz.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        // Select option
+        function selectOption(index) {
+            const question = currentQuiz[currentQuestionIndex];
+            const options = document.querySelectorAll('.option');
+            const isCorrect = index === question.correctAnswer;
+
+            // If user already got this question correct, don't allow changes
+            if (answeredQuestions[currentQuestionIndex]) return;
+
+            // Remove previous selections
+            options.forEach(opt => {
+                opt.classList.remove('selected', 'incorrect');
+            });
+
+            // Mark the selected option
+            options[index].classList.add('selected');
+
+            if (isCorrect) {
+                // Correct answer selected
+                answeredQuestions[currentQuestionIndex] = true;
+                
+                // Highlight the correct answer
+                options[question.correctAnswer].classList.add('correct');
+                
+                // Disable all options
+                options.forEach(opt => {
+                    opt.style.cursor = 'default';
+                });
+
+                // Update score
+                score++;
+
+                // Show result badge
+                const card = document.getElementById('questionCard');
+                
+                // Remove any previous result/explanation
+                const oldResult = card.querySelector('.result-badge');
+                const oldExplanation = card.querySelector('.explanation');
+                if (oldResult) oldResult.remove();
+                if (oldExplanation) oldExplanation.remove();
+
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'result-badge result-correct';
+                resultDiv.textContent = '✓ 回答正确！';
+                card.appendChild(resultDiv);
+
+                // Show explanation
+                if (question.explanation) {
+                    const explanationDiv = document.createElement('div');
+                    explanationDiv.className = 'explanation';
+                    explanationDiv.innerHTML = `<strong>解释：</strong> ${question.explanation}`;
+                    card.appendChild(explanationDiv);
+                }
+            } else {
+                // Wrong answer - mark it but allow retry
+                options[index].classList.add('incorrect');
+                
+                // Show temporary wrong message
+                const card = document.getElementById('questionCard');
+                
+                // Remove any previous wrong message
+                const oldResult = card.querySelector('.result-badge');
+                if (oldResult) oldResult.remove();
+
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'result-badge result-wrong';
+                resultDiv.textContent = '✗ 回答错误';
+                card.appendChild(resultDiv);
+            }
+        }
+
+        // Show results
+        function showResults() {
+            showScreen('resultsScreen');
+            const percentage = Math.round((score / currentQuiz.length) * 100);
+            document.getElementById('finalScore').textContent = 
+                `得分：${score} / ${currentQuiz.length} (${percentage}%)`;
+        }
+
+        // Restart quiz
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            showScreen('quizScreen');
+            renderQuestion();
+        }
+
+        // Initialize
+        loadQuizzes();
+        renderQuizList();
+    </script>
+</body>
+</html>
