@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Period Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .current-month-section {
+            margin-bottom: 40px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .month-year {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .calendar.small {
+            gap: 5px;
+        }
+
+        .day-header {
+            text-align: center;
+            font-weight: bold;
+            color: #666;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .calendar.small .day-header {
+            font-size: 12px;
+            padding: 5px;
+        }
+
+        .day-cell {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            background: white;
+        }
+
+        .day-cell:hover {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .day-cell.empty {
+            border: none;
+            cursor: default;
+        }
+
+        .day-cell.empty:hover {
+            transform: none;
+        }
+
+        .day-cell.today {
+            border: 3px dashed #667eea;
+            background: #f0f4ff;
+        }
+
+        .day-number {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .calendar.small .day-number {
+            font-size: 12px;
+        }
+
+        .day-cell.has-start {
+            background: #ff4444 !important;
+        }
+
+        .day-cell.has-start .day-number {
+            color: white;
+        }
+
+        .day-cell.has-end {
+            background: #ffb6c1 !important;
+        }
+
+        .day-cell.has-end .day-number {
+            color: #333;
+        }
+
+        .day-cell.has-custom {
+            background: #ffd700 !important;
+        }
+
+        .day-cell.has-custom .day-number {
+            color: #333;
+        }
+
+        .day-cell.has-multiple {
+            background: linear-gradient(135deg, #ff4444 0%, #ff4444 33%, #ffb6c1 33%, #ffb6c1 66%, #ffd700 66%, #ffd700 100%) !important;
+        }
+
+        .day-cell.has-multiple .day-number {
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .day-cell.has-start-end {
+            background: linear-gradient(135deg, #ff4444 0%, #ff4444 50%, #ffb6c1 50%, #ffb6c1 100%) !important;
+        }
+
+        .day-cell.has-start-end .day-number {
+            color: white;
+        }
+
+        .day-cell.has-start-custom {
+            background: linear-gradient(135deg, #ff4444 0%, #ff4444 50%, #ffd700 50%, #ffd700 100%) !important;
+        }
+
+        .day-cell.has-start-custom .day-number {
+            color: white;
+        }
+
+        .day-cell.has-end-custom {
+            background: linear-gradient(135deg, #ffb6c1 0%, #ffb6c1 50%, #ffd700 50%, #ffd700 100%) !important;
+        }
+
+        .day-cell.has-end-custom .day-number {
+            color: #333;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .action-buttons button {
+            flex: 1;
+            max-width: 200px;
+        }
+
+        .action-buttons button.start-btn {
+            background: #ff4444;
+            color: black;
+        }
+
+        .action-buttons button.end-btn {
+            background: #ffb6c1;
+            color: black;
+        }
+
+        .action-buttons button.custom-btn {
+            background: #ffd700;
+            color: black;
+        }
+
+        .action-buttons button.clear-btn {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .previous-months {
+            border-top: 2px solid #e0e0e0;
+            padding-top: 30px;
+        }
+
+        .previous-months h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .small-calendars {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .small-calendar-wrapper {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .small-calendar-header {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+        }
+
+        /* Event Details Popup */
+        .event-details {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 300px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .event-details h3 {
+            margin-bottom: 15px;
+            color: #667eea;
+            text-align: center;
+        }
+
+        .event-list {
+            margin-bottom: 20px;
+        }
+
+        .event-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .event-item:last-child {
+            border-bottom: none;
+        }
+
+        .event-type {
+            display: inline-block;
+            width: 80px;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .event-name {
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .month-year {
+                font-size: 18px;
+            }
+
+            .calendar {
+                gap: 5px;
+            }
+
+            .day-number {
+                font-size: 14px;
+            }
+
+            .small-calendars {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-buttons button {
+                max-width: 100%;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📅 Period Tracker</h1>
+        
+        <div class="current-month-section">
+            <div class="calendar-header">
+                <div class="month-year" id="currentMonthYear"></div>
+                <div class="nav-buttons">
+                    <button onclick="changeMonth(-1)">← Prev</button>
+                    <button onclick="changeMonth(1)">Next →</button>
+                </div>
+            </div>
+            <div id="currentCalendar" class="calendar"></div>
+            
+            <div class="action-buttons">
+                <button class="start-btn" onclick="markDate('start')">Mark Start</button>
+                <button class="end-btn" onclick="markDate('end')">Mark End</button>
+                <button class="custom-btn" onclick="showCustomModal()">Custom Event</button>
+                <button class="clear-btn" onclick="clearRecord()">Clear Record</button>
+            </div>
+        </div>
+
+        <div class="previous-months">
+            <h2>Previous Months</h2>
+            <div class="small-calendars" id="previousMonths"></div>
+        </div>
+    </div>
+
+    <!-- Custom Event Modal -->
+    <div class="modal" id="customModal">
+        <div class="modal-content">
+            <h3>Add Custom Event</h3>
+            <input type="text" id="customEventName" placeholder="Event name (e.g., Doctor visit)">
+            <div class="modal-buttons">
+                <button onclick="saveCustomEvent()">Save</button>
+                <button onclick="closeCustomModal()" style="background: #ccc; color: #333;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Details Modal -->
+    <div class="modal" id="eventDetailsModal">
+        <div class="event-details">
+            <h3 id="eventDateTitle">Event Details</h3>
+            <div class="event-list" id="eventList"></div>
+            <div class="modal-buttons">
+                <button onclick="closeEventDetails()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        let selectedDate = null;
+        let events = JSON.parse(localStorage.getItem('periodTrackerEvents')) || {};
+
+        function saveEvents() {
+            localStorage.setItem('periodTrackerEvents', JSON.stringify(events));
+        }
+
+        function formatDateKey(date) {
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+
+        function formatDisplayDate(date) {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        function renderCalendar(year, month, containerId, isSmall = false) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            container.className = isSmall ? 'calendar small' : 'calendar';
+
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'day-header';
+                header.textContent = day;
+                container.appendChild(header);
+            });
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
+
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'day-cell empty';
+                container.appendChild(emptyCell);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cell = document.createElement('div');
+                cell.className = 'day-cell';
+                
+                const date = new Date(year, month, day);
+                const dateKey = formatDateKey(date);
+                
+                if (!isSmall && date.toDateString() === today.toDateString()) {
+                    cell.classList.add('today');
+                }
+
+                const dayNumber = document.createElement('div');
+                dayNumber.className = 'day-number';
+                dayNumber.textContent = day;
+                cell.appendChild(dayNumber);
+
+                if (events[dateKey]) {
+                    const eventTypes = events[dateKey].map(e => e.type);
+                    const hasStart = eventTypes.includes('start');
+                    const hasEnd = eventTypes.includes('end');
+                    const hasCustom = eventTypes.includes('custom');
+                    
+                    const count = (hasStart ? 1 : 0) + (hasEnd ? 1 : 0) + (hasCustom ? 1 : 0);
+                    
+                    if (count === 1) {
+                        if (hasStart) cell.classList.add('has-start');
+                        else if (hasEnd) cell.classList.add('has-end');
+                        else if (hasCustom) cell.classList.add('has-custom');
+                    } else if (count === 2) {
+                        if (hasStart && hasEnd) cell.classList.add('has-start-end');
+                        else if (hasStart && hasCustom) cell.classList.add('has-start-custom');
+                        else if (hasEnd && hasCustom) cell.classList.add('has-end-custom');
+                    } else if (count === 3) {
+                        cell.classList.add('has-multiple');
+                    }
+                }
+
+                // Make all calendar cells clickable to show event details
+                cell.onclick = () => {
+                    if (!isSmall) {
+                        // For current month, also select the date
+                        document.querySelectorAll('.day-cell').forEach(c => c.style.background = '');
+                        cell.style.background = '#e8f0fe';
+                        selectedDate = date;
+                    }
+                    
+                    // Show event details if there are events for this date
+                    if (events[dateKey] && events[dateKey].length > 0) {
+                        showEventDetails(date, dateKey);
+                    }
+                };
+
+                container.appendChild(cell);
+            }
+        }
+
+        function showEventDetails(date, dateKey) {
+            const modal = document.getElementById('eventDetailsModal');
+            const dateTitle = document.getElementById('eventDateTitle');
+            const eventList = document.getElementById('eventList');
+            
+            dateTitle.textContent = formatDisplayDate(date);
+            eventList.innerHTML = '';
+            
+            events[dateKey].forEach(event => {
+                const eventItem = document.createElement('div');
+                eventItem.className = 'event-item';
+                
+                const eventType = document.createElement('span');
+                eventType.className = 'event-type';
+                
+                if (event.type === 'start') {
+                    eventType.textContent = 'Period Start:';
+                    eventType.style.color = '#ff4444';
+                } else if (event.type === 'end') {
+                    eventType.textContent = 'Period End:';
+                    eventType.style.color = '#ffb6c1';
+                } else {
+                    eventType.textContent = 'Custom Event:';
+                    eventType.style.color = '#ffd700';
+                }
+                
+                const eventName = document.createElement('span');
+                eventName.className = 'event-name';
+                eventName.textContent = event.name;
+                
+                eventItem.appendChild(eventType);
+                eventItem.appendChild(eventName);
+                eventList.appendChild(eventItem);
+            });
+            
+            modal.classList.add('show');
+        }
+
+        function closeEventDetails() {
+            document.getElementById('eventDetailsModal').classList.remove('show');
+        }
+
+        function updateCurrentMonth() {
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('currentMonthYear').textContent = 
+                `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            renderCalendar(currentDate.getFullYear(), currentDate.getMonth(), 'currentCalendar');
+        }
+
+        function updatePreviousMonths() {
+            const container = document.getElementById('previousMonths');
+            container.innerHTML = '';
+            
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+
+            for (let i = 1; i <= 3; i++) {
+                const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+                const wrapper = document.createElement('div');
+                wrapper.className = 'small-calendar-wrapper';
+                
+                const header = document.createElement('div');
+                header.className = 'small-calendar-header';
+                header.textContent = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+                wrapper.appendChild(header);
+                
+                const calendarDiv = document.createElement('div');
+                calendarDiv.id = `smallCalendar${i}`;
+                wrapper.appendChild(calendarDiv);
+                
+                container.appendChild(wrapper);
+                renderCalendar(date.getFullYear(), date.getMonth(), `smallCalendar${i}`, true);
+            }
+        }
+
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            updateCurrentMonth();
+            updatePreviousMonths();
+        }
+
+        function markDate(type) {
+            if (!selectedDate) {
+                alert('Please select a date first!');
+                return;
+            }
+
+            const dateKey = formatDateKey(selectedDate);
+            if (!events[dateKey]) {
+                events[dateKey] = [];
+            }
+
+            const existingIndex = events[dateKey].findIndex(e => e.type === type);
+            if (existingIndex >= 0) {
+                events[dateKey].splice(existingIndex, 1);
+                if (events[dateKey].length === 0) {
+                    delete events[dateKey];
+                }
+            } else {
+                events[dateKey].push({ type, name: type === 'start' ? 'Period Start' : 'Period End' });
+            }
+
+            saveEvents();
+            updateCurrentMonth();
+            updatePreviousMonths();
+        }
+
+        function showCustomModal() {
+            if (!selectedDate) {
+                alert('Please select a date first!');
+                return;
+            }
+            document.getElementById('customModal').classList.add('show');
+        }
+
+        function closeCustomModal() {
+            document.getElementById('customModal').classList.remove('show');
+            document.getElementById('customEventName').value = '';
+        }
+
+        function saveCustomEvent() {
+            const eventName = document.getElementById('customEventName').value.trim();
+            if (!eventName) {
+                alert('Please enter an event name!');
+                return;
+            }
+
+            const dateKey = formatDateKey(selectedDate);
+            if (!events[dateKey]) {
+                events[dateKey] = [];
+            }
+
+            events[dateKey].push({ type: 'custom', name: eventName });
+            saveEvents();
+            updateCurrentMonth();
+            updatePreviousMonths();
+            closeCustomModal();
+        }
+
+        function clearRecord() {
+            if (!selectedDate) {
+                alert('Please select a date first!');
+                return;
+            }
+
+            const dateKey = formatDateKey(selectedDate);
+            
+            if (!events[dateKey] || events[dateKey].length === 0) {
+                alert('No records found for the selected date!');
+                return;
+            }
+
+            if (confirm('Are you sure you want to delete all records for this date?')) {
+                delete events[dateKey];
+                saveEvents();
+                updateCurrentMonth();
+                updatePreviousMonths();
+                
+                // Clear the selection highlight
+                document.querySelectorAll('.day-cell').forEach(c => c.style.background = '');
+                selectedDate = null;
+                
+                alert('Records deleted successfully!');
+            }
+        }
+
+        // Initialize
+        updateCurrentMonth();
+        updatePreviousMonths();
+    </script>
+</body>
+</html>
