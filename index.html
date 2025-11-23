@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>记忆卡片应用</title>
+    <title>我的小程序</title>
     <style>
         * {
             margin: 0;
@@ -12,920 +12,276 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
-            background: linear-gradient(135deg, #e0f2fe 0%, #ddd6fe 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             padding: 20px;
         }
 
         .container {
             max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 24px;
-            margin-bottom: 24px;
-        }
-
-        .paste-area {
-            margin-top: 16px;
-        }
-
-        .paste-textarea {
             width: 100%;
-            min-height: 150px;
-            padding: 12px;
-            border: 2px dashed #d1d5db;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 0.875rem;
-            resize: vertical;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 50px;
+            margin: 20px 0;
+            position: relative;
         }
 
-        .paste-textarea:focus {
-            outline: none;
-            border-color: #4f46e5;
+        .language-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 8px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
-        .btn-secondary {
-            background: #10b981;
+        .language-toggle:hover {
+            background: #667eea;
             color: white;
         }
 
-        .btn-secondary:hover {
-            background: #059669;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            body {
-                background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-            }
-
-            .card {
-                background: #1f2937;
-                color: #e5e7eb;
-            }
-
-            h1, .study-title {
-                color: #f9fafb;
-            }
-
-            .subtitle {
-                color: #9ca3af;
-            }
-
-            .flashcard-item {
-                background: #1f2937;
-            }
-
-            .flashcard-info h3 {
-                color: #f9fafb;
-            }
-
-            .flashcard-info p {
-                color: #9ca3af;
-            }
-
-            .empty-state {
-                background: #1f2937;
-                color: #9ca3af;
-            }
-
-            .info-box {
-                background: #374151;
-                color: #d1d5db;
-            }
-
-            .info-box pre {
-                background: #1f2937;
-                color: #e5e7eb;
-            }
-
-            .edit-input, .paste-textarea {
-                background: #374151;
-                border-color: #4b5563;
-                color: #e5e7eb;
-            }
-
-            .edit-input:focus, .paste-textarea:focus {
-                border-color: #6366f1;
-            }
-
-            .paste-textarea {
-                border-style: dashed;
-            }
-
-            .btn-prev {
-                background: #374151;
-                color: #e5e7eb;
-            }
-
-            .btn-prev:hover:not(:disabled) {
-                background: #4b5563;
-            }
-
-            .back-btn {
-                color: #818cf8;
-            }
-
-            .back-btn:hover {
-                color: #a5b4fc;
-            }
-
-            .btn-icon {
-                color: #9ca3af;
-            }
-
-            .btn-icon:hover {
-                color: #818cf8;
-                background: #374151;
-            }
-
-            .card-counter, .flip-hint {
-                color: #9ca3af;
-            }
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            margin-top: 20px;
         }
 
         h1 {
-            font-size: 2rem;
-            color: #1f2937;
-            margin-bottom: 8px;
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 15px;
         }
 
         .subtitle {
-            color: #6b7280;
-            margin-bottom: 16px;
+            color: #666;
+            font-size: 1.2em;
+            line-height: 1.6;
         }
 
-        .status-message {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            display: none;
-            align-items: center;
-            gap: 8px;
+        .projects {
+            display: grid;
+            gap: 25px;
+            margin-bottom: 50px;
         }
 
-        .status-message.show {
-            display: flex;
+        .project-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 30px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
         }
 
-        .status-message.success {
-            background: #d1fae5;
-            color: #065f46;
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
         }
 
-        .status-message.error {
-            background: #fee2e2;
-            color: #991b1b;
+        .project-card h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 10px;
         }
 
-        .status-message.info {
-            background: #dbeafe;
-            color: #1e40af;
+        .project-card p {
+            color: #555;
+            line-height: 1.6;
         }
 
-        .btn {
-            padding: 12px 24px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 500;
-            transition: all 0.2s;
+        .project-card .arrow {
+            display: inline-block;
+            margin-left: 10px;
+            transition: transform 0.3s ease;
         }
 
-        .btn-primary {
-            background: #4f46e5;
-            color: white;
+        .project-card:hover .arrow {
+            transform: translateX(5px);
         }
 
-        .btn-primary:hover {
-            background: #4338ca;
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .file-input-label {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .info-box {
-            background: #f9fafb;
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 16px;
-            font-size: 0.875rem;
-            color: #4b5563;
-        }
-
-        .info-box strong {
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .info-box pre {
-            background: white;
-            padding: 8px;
-            border-radius: 4px;
-            margin-top: 8px;
-            font-size: 0.75rem;
-            overflow-x: auto;
-        }
-
-        .flashcard-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .flashcard-item {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 24px;
-            transition: box-shadow 0.2s;
-        }
-
-        .flashcard-item:hover {
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .flashcard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .flashcard-info h3 {
-            font-size: 1.25rem;
-            color: #1f2937;
-            margin-bottom: 4px;
-        }
-
-        .flashcard-info p {
-            color: #6b7280;
-            font-size: 0.875rem;
-        }
-
-        .flashcard-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-study {
-            background: #4f46e5;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .btn-study:hover {
-            background: #4338ca;
-        }
-
-        .btn-icon {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px;
-            color: #6b7280;
-            border-radius: 4px;
-        }
-
-        .btn-icon:hover {
-            color: #4f46e5;
-            background: #f3f4f6;
-        }
-
-        .btn-icon.delete:hover {
-            color: #dc2626;
-        }
-
-        .empty-state {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 48px;
+        .contact-section {
             text-align: center;
-            color: #6b7280;
+            padding-top: 30px;
+            border-top: 2px solid #eee;
         }
 
-        /* Study Mode Styles */
-        .study-container {
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .study-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .back-btn {
-            color: #4f46e5;
-            font-weight: 500;
-            cursor: pointer;
-            background: none;
-            border: none;
-            font-size: 1rem;
-        }
-
-        .back-btn:hover {
-            color: #4338ca;
-        }
-
-        .study-title {
-            font-size: 1.25rem;
-            color: #1f2937;
-        }
-
-        .card-counter {
-            text-align: center;
-            color: #6b7280;
-            font-size: 0.875rem;
-            margin-bottom: 16px;
-        }
-
-        .flashcard {
-            background: #000000;
-            border-radius: 16px;
-            padding: 48px;
-            min-height: 300px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        .flashcard.flipped {
-            background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
-        }
-
-        .flashcard:hover {
-            transform: scale(1.02);
-        }
-
-        .flashcard-content {
+        .contact-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            font-size: 1.25rem;
-            text-align: center;
-            line-height: 1.8;
-        }
-
-        .flip-hint {
-            text-align: center;
-            color: #6b7280;
-            font-size: 0.875rem;
-            margin-top: 16px;
-            margin-bottom: 24px;
-        }
-
-        .navigation {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .btn-nav {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            border-radius: 8px;
             border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 50px;
             cursor: pointer;
-            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .btn-prev {
-            background: #e5e7eb;
-            color: #374151;
+        .contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
         }
 
-        .btn-prev:hover:not(:disabled) {
-            background: #d1d5db;
+        .contact-btn:active {
+            transform: translateY(0);
         }
 
-        .btn-next {
-            background: #4f46e5;
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #4caf50;
             color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
         }
 
-        .btn-next:hover:not(:disabled) {
-            background: #4338ca;
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .btn-nav:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
 
-        .edit-form {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
+            h1 {
+                font-size: 2em;
+            }
 
-        .edit-input {
-            flex: 1;
-            padding: 8px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
+            .project-card h2 {
+                font-size: 1.5em;
+            }
 
-        .edit-input:focus {
-            outline: none;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-
-        .hidden {
-            display: none;
+            .language-toggle {
+                top: 10px;
+                right: 10px;
+                padding: 6px 15px;
+                font-size: 0.85em;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div id="homeView">
-            <div class="card">
-                <h1>记忆卡片应用</h1>
-                <p class="subtitle">导入CSV文件创建卡片组</p>
-                
-                <div id="statusMessage" class="status-message"></div>
-                
-                <label class="btn btn-primary file-input-label">
-                    <span>📁</span>
-                    <span id="uploadBtnText">导入CSV文件</span>
-                    <input type="file" id="fileInput" accept=".csv" style="display: none;">
-                </label>
-                
-                <div class="paste-area">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">或直接粘贴CSV内容：</label>
-                    <textarea id="pasteArea" class="paste-textarea" placeholder="在此粘贴CSV内容...
-示例：
-&quot;问题1&quot;,&quot;答案1&quot;
-&quot;问题2&quot;,&quot;答案2&quot;"></textarea>
-                    <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
-                        <button class="btn btn-secondary" onclick="processPastedContent()">
-                            📋 从粘贴内容创建卡片
-                        </button>
-                        <button class="btn btn-secondary" onclick="copyPromptToClipboard()" style="background: #8b5cf6;">
-                            🤖 复制AI提示词
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="info-box">
-                    <strong>CSV格式：</strong> CSV文件应包含两列：问题,答案
-                    <br>
-                    <strong>示例：</strong>
-                    <pre>"2+2等于多少？","4"
-"法国的首都是？","巴黎"</pre>
-                </div>
-            </div>
+        <button class="language-toggle" onclick="toggleLanguage()">English</button>
+        
+        <header>
+            <h1 id="title">🚀 我的小程序</h1>
+            <p class="subtitle" id="subtitle">欢迎！这里收集了我最近创建的一些实用工具。点击任意项目即可体验！</p>
+        </header>
 
-            <div id="flashcardList" class="flashcard-list"></div>
+        <div class="projects">
+            <a href="https://hjuan422-hjj.github.io/MemoryHelper.html" class="project-card">
+                <h2 id="project1-title">📚 记忆卡片应用</h2>
+                <p id="project1-desc">智能学习工具,帮助您有效记忆和复习信息。学习和记忆的完美助手。<span class="arrow">→</span></p>
+            </a>
+
+            <a href="https://hjuan422-hjj.github.io/littleQuiz.html" class="project-card">
+                <h2 id="project2-title">✏️ 测验生成器</h2>
+                <p id="project2-desc">即时创建自定义测验！测试您的知识或用个性化问题挑战您的朋友。<span class="arrow">→</span></p>
+            </a>
+
+            <a href="https://hjuan422-hjj.github.io/MoonRecord.html" class="project-card">
+                <h2 id="project3-title">🌙 生理期记录</h2>
+                <p id="project3-desc">简单私密的生理周期追踪工具。轻松了解身体状况,提前做好计划。<span class="arrow">→</span></p>
+            </a>
         </div>
 
-        <div id="studyView" class="hidden">
-            <div class="card study-container">
-                <div class="study-header">
-                    <button class="back-btn" onclick="exitStudyMode()">← 返回卡片组</button>
-                    <h2 class="study-title" id="studyTitle"></h2>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn-icon" onclick="shuffleCards()" title="随机排序">🔀</button>
-                        <button class="btn-icon" onclick="resetStudy()" title="重新开始">🔄</button>
-                    </div>
-                </div>
-                
-                <div class="card-counter" id="cardCounter"></div>
-                
-                <div class="flashcard" id="flashcardElement" onclick="flipCard()">
-                    <div class="flashcard-content" id="cardContent"></div>
-                </div>
-                
-                <div class="flip-hint" id="flipHint"></div>
-                
-                <div class="navigation">
-                    <button class="btn-nav btn-prev" id="prevBtn" onclick="previousCard()">
-                        ← 上一张
-                    </button>
-                    <button class="btn-nav btn-next" id="nextBtn" onclick="nextCard()">
-                        下一张 →
-                    </button>
-                </div>
-            </div>
+        <div class="contact-section">
+            <button class="contact-btn" onclick="copyQQ()">
+                <span id="contact-btn-text">📱 联系我</span>
+            </button>
         </div>
     </div>
 
+    <div class="toast" id="toast">QQ号已复制：12345</div>
+
     <script>
-        let flashcardSets = [];
-        let currentSetId = null;
-        let currentCardIndex = 0;
-        let isFlipped = false;
-        let shuffledCards = null;
+        let currentLang = 'zh';
 
-        window.addEventListener('DOMContentLoaded', loadFlashcardSets);
-
-        function loadFlashcardSets() {
-            try {
-                const savedSets = localStorage.getItem('flashcardSets');
-                if (savedSets) {
-                    flashcardSets = JSON.parse(savedSets);
-                    flashcardSets.sort((a, b) => b.createdAt - a.createdAt);
-                }
-                renderFlashcardList();
-            } catch (error) {
-                console.error('加载卡片组时出错：', error);
-                flashcardSets = [];
-                renderFlashcardList();
+        const translations = {
+            zh: {
+                title: '🚀 我的小程序',
+                subtitle: '欢迎！这里收集了我最近创建的一些实用工具。点击任意项目即可体验！',
+                project1Title: '📚 记忆卡片应用',
+                project1Desc: '智能学习工具,帮助您有效记忆和复习信息。学习和记忆的完美助手。',
+                project2Title: '✏️ 测验生成器',
+                project2Desc: '即时创建自定义测验！测试您的知识或用个性化问题挑战您的朋友。',
+                project3Title: '🌙 生理期记录',
+                project3Desc: '简单私密的生理周期追踪工具。轻松了解身体状况,提前做好计划。',
+                contactBtn: '📱 联系我',
+                toast: 'QQ号已复制：12345',
+                langBtn: 'English'
+            },
+            en: {
+                title: '🚀 My Little Programs',
+                subtitle: 'Welcome! Here\'s a collection of handy tools I\'ve created recently. Click on any project to try it out!',
+                project1Title: '📚 Flashcard App',
+                project1Desc: 'A smart learning tool to help you memorize and review information effectively. Perfect for studying and retention.',
+                project2Title: '✏️ Quiz Generator',
+                project2Desc: 'Create custom quizzes instantly! Test your knowledge or challenge your friends with personalized questions.',
+                project3Title: '🌙 Period Tracker',
+                project3Desc: 'A private and simple way to track your menstrual cycle. Stay informed and plan ahead with ease.',
+                contactBtn: '📱 Contact Me',
+                toast: 'QQ number copied: 12345',
+                langBtn: '中文'
             }
-        }
+        };
 
-        function saveFlashcardSets() {
-            try {
-                localStorage.setItem('flashcardSets', JSON.stringify(flashcardSets));
-                return true;
-            } catch (error) {
-                console.error('保存卡片组时出错：', error);
-                return false;
-            }
-        }
-
-        function renderFlashcardList() {
-            const listContainer = document.getElementById('flashcardList');
+        function toggleLanguage() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            const t = translations[currentLang];
             
-            if (flashcardSets.length === 0) {
-                listContainer.innerHTML = '<div class="empty-state">还没有卡片组。导入CSV文件开始使用吧！</div>';
-                return;
-            }
-
-            listContainer.innerHTML = flashcardSets.map(set => `
-                <div class="flashcard-item" id="set-${set.id}">
-                    <div class="flashcard-header">
-                        <div class="flashcard-info">
-                            <div id="name-${set.id}">
-                                <h3>${set.name}</h3>
-                                <p>${set.cards.length} 张卡片</p>
-                                <p style="font-size: 0.75rem; color: #9ca3af;">创建于：${new Date(set.createdAt).toLocaleDateString('zh-CN')}</p>
-                            </div>
-                            <div id="edit-${set.id}" class="edit-form hidden">
-                                <input type="text" class="edit-input" id="editInput-${set.id}" value="${set.name}">
-                                <button class="btn btn-primary" onclick="saveEdit('${set.id}')">保存</button>
-                                <button class="btn" onclick="cancelEdit('${set.id}')" style="background: #e5e7eb; color: #374151;">取消</button>
-                            </div>
-                        </div>
-                        <div class="flashcard-actions" id="actions-${set.id}">
-                            <button class="btn-study" onclick="startStudying('${set.id}')">
-                                ▶ 开始学习
-                            </button>
-                            <button class="btn-icon" onclick="startEditing('${set.id}')" title="重命名">✏️</button>
-                            <button class="btn-icon delete" onclick="deleteSet('${set.id}')" title="删除">🗑️</button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        document.getElementById('fileInput').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            showStatus('正在读取文件...', 'info');
-            const uploadBtn = document.getElementById('uploadBtnText');
-            uploadBtn.textContent = '处理中...';
-
-            const reader = new FileReader();
+            document.getElementById('title').textContent = t.title;
+            document.getElementById('subtitle').textContent = t.subtitle;
+            document.getElementById('project1-title').textContent = t.project1Title;
+            document.getElementById('project1-desc').innerHTML = t.project1Desc + '<span class="arrow">→</span>';
+            document.getElementById('project2-title').textContent = t.project2Title;
+            document.getElementById('project2-desc').innerHTML = t.project2Desc + '<span class="arrow">→</span>';
+            document.getElementById('project3-title').textContent = t.project3Title;
+            document.getElementById('project3-desc').innerHTML = t.project3Desc + '<span class="arrow">→</span>';
+            document.getElementById('contact-btn-text').textContent = t.contactBtn;
+            document.querySelector('.language-toggle').textContent = t.langBtn;
+            document.getElementById('toast').textContent = t.toast;
             
-            reader.onerror = () => {
-                showStatus('读取文件出错，请重试。', 'error');
-                uploadBtn.textContent = '导入CSV文件';
-            };
+            document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+            document.title = currentLang === 'zh' ? '我的小程序' : 'My Little Programs';
+        }
+
+        function copyQQ() {
+            const qqNumber = '12345';
             
-            reader.onload = (e) => {
-                try {
-                    const text = e.target.result;
-                    const lines = text.split(/\r?\n/).filter(line => line.trim());
-                    
-                    const cards = [];
-                    
-                    for (let line of lines) {
-                        line = line.trim();
-                        if (!line) continue;
-                        
-                        const regex = /"([^"]*)"|([^,]+)/g;
-                        const parts = [];
-                        let match;
-                        
-                        while ((match = regex.exec(line)) !== null) {
-                            parts.push(match[1] !== undefined ? match[1] : match[2]);
-                        }
-                        
-                        if (parts.length >= 2) {
-                            const front = parts[0].trim();
-                            const back = parts[1].trim();
-                            
-                            if (front && back) {
-                                cards.push({ front, back });
-                            }
-                        }
-                    }
-
-                    console.log('解析的卡片数：', cards.length);
-                    
-                    if (cards.length > 0) {
-                        showStatus(`已解析 ${cards.length} 张卡片。请输入名称...`, 'info');
-                        
-                        setTimeout(() => {
-                            const defaultName = file.name.replace('.csv', '').replace(/[^a-zA-Z0-9\u4e00-\u9fa5 -]/g, '');
-                            const setName = prompt(`找到 ${cards.length} 张记忆卡片！\n\n请为此卡片组命名：`, defaultName);
-                            
-                            if (setName && setName.trim()) {
-                                showStatus('正在保存卡片组...', 'info');
-                                
-                                const newSet = {
-                                    id: Date.now().toString(),
-                                    name: setName.trim(),
-                                    cards: cards,
-                                    createdAt: Date.now()
-                                };
-
-                                flashcardSets.push(newSet);
-                                
-                                if (saveFlashcardSets()) {
-                                    loadFlashcardSets();
-                                    showStatus(`✓ 成功导入 ${cards.length} 张卡片为"${setName}"！`, 'success');
-                                } else {
-                                    showStatus('保存卡片组失败。存储空间可能已满。', 'error');
-                                    flashcardSets.pop();
-                                }
-                            } else {
-                                showStatus('已取消导入', 'error');
-                            }
-                            
-                            uploadBtn.textContent = '导入CSV文件';
-                        }, 100);
-                    } else {
-                        showStatus('未找到有效的卡片。请检查CSV格式。', 'error');
-                        uploadBtn.textContent = '导入CSV文件';
-                    }
-                } catch (error) {
-                    console.error('处理文件时出错：', error);
-                    showStatus(`错误：${error.message}`, 'error');
-                    uploadBtn.textContent = '导入CSV文件';
-                }
-            };
-            
-            reader.readAsText(file, 'UTF-8');
-            event.target.value = '';
-        });
-
-        function showStatus(message, type) {
-            const statusEl = document.getElementById('statusMessage');
-            statusEl.textContent = message;
-            statusEl.className = `status-message ${type} show`;
-            
-            setTimeout(() => {
-                statusEl.classList.remove('show');
-            }, 5000);
-        }
-
-        function deleteSet(id) {
-            if (confirm('确定要删除此卡片组吗？')) {
-                flashcardSets = flashcardSets.filter(s => s.id !== id);
-                if (saveFlashcardSets()) {
-                    loadFlashcardSets();
-                    showStatus('卡片组已删除', 'success');
-                } else {
-                    showStatus('删除卡片组失败', 'error');
-                }
-            }
-        }
-
-        function startEditing(id) {
-            document.getElementById(`name-${id}`).classList.add('hidden');
-            document.getElementById(`edit-${id}`).classList.remove('hidden');
-            document.getElementById(`actions-${id}`).classList.add('hidden');
-            document.getElementById(`editInput-${id}`).focus();
-        }
-
-        function cancelEdit(id) {
-            document.getElementById(`name-${id}`).classList.remove('hidden');
-            document.getElementById(`edit-${id}`).classList.add('hidden');
-            document.getElementById(`actions-${id}`).classList.remove('hidden');
-        }
-
-        function saveEdit(id) {
-            const newName = document.getElementById(`editInput-${id}`).value.trim();
-            if (!newName) return;
-
-            const set = flashcardSets.find(s => s.id === id);
-            if (set) {
-                set.name = newName;
-                if (saveFlashcardSets()) {
-                    loadFlashcardSets();
-                    showStatus('名称已更新', 'success');
-                } else {
-                    showStatus('更新名称失败', 'error');
-                }
-            }
-        }
-
-        function startStudying(setId) {
-            currentSetId = setId;
-            currentCardIndex = 0;
-            isFlipped = false;
-            shuffledCards = null;
-            
-            const set = flashcardSets.find(s => s.id === setId);
-            document.getElementById('studyTitle').textContent = set.name;
-            
-            document.getElementById('homeView').classList.add('hidden');
-            document.getElementById('studyView').classList.remove('hidden');
-            
-            updateStudyCard();
-        }
-
-        function exitStudyMode() {
-            document.getElementById('studyView').classList.add('hidden');
-            document.getElementById('homeView').classList.remove('hidden');
-        }
-
-        function updateStudyCard() {
-            const set = flashcardSets.find(s => s.id === currentSetId);
-            const cards = shuffledCards || set.cards;
-            const card = cards[currentCardIndex];
-            
-            document.getElementById('cardCounter').textContent = `第 ${currentCardIndex + 1} 张，共 ${cards.length} 张`;
-            document.getElementById('cardContent').textContent = isFlipped ? card.back : card.front;
-            document.getElementById('flipHint').textContent = isFlipped ? '答案 - 点击卡片翻转' : '问题 - 点击卡片翻转';
-            
-            document.getElementById('prevBtn').disabled = currentCardIndex === 0;
-            document.getElementById('nextBtn').disabled = currentCardIndex === cards.length - 1;
-        }
-
-        function flipCard() {
-            isFlipped = !isFlipped;
-            updateStudyCard();
-        }
-
-        function nextCard() {
-            const set = flashcardSets.find(s => s.id === currentSetId);
-            const cards = shuffledCards || set.cards;
-            if (currentCardIndex < cards.length - 1) {
-                currentCardIndex++;
-                isFlipped = false;
-                updateStudyCard();
-            }
-        }
-
-        function previousCard() {
-            if (currentCardIndex > 0) {
-                currentCardIndex--;
-                isFlipped = false;
-                updateStudyCard();
-            }
-        }
-
-        function resetStudy() {
-            currentCardIndex = 0;
-            isFlipped = false;
-            shuffledCards = null;
-            updateStudyCard();
-        }
-
-        function shuffleCards() {
-            const set = flashcardSets.find(s => s.id === currentSetId);
-            shuffledCards = [...set.cards];
-            
-            for (let i = shuffledCards.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffledCards[i], shuffledCards[j]] = [shuffledCards[j], shuffledCards[i]];
-            }
-            
-            currentCardIndex = 0;
-            isFlipped = false;
-            updateStudyCard();
-        }
-
-        function copyPromptToClipboard() {
-            const promptText = '准备关于........的记忆卡片，以CSV格式显示。第一列是问题，第二列是答案。';
-            
-            navigator.clipboard.writeText(promptText).then(() => {
-                showStatus('✓ AI提示词已复制到剪贴板！在大语言模型中使用它来生成记忆卡片。', 'success');
+            navigator.clipboard.writeText(qqNumber).then(() => {
+                const toast = document.getElementById('toast');
+                toast.classList.add('show');
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
             }).catch(err => {
-                const textarea = document.createElement('textarea');
-                textarea.value = promptText;
-                textarea.style.position = 'fixed';
-                textarea.style.opacity = '0';
-                document.body.appendChild(textarea);
-                textarea.select();
-                try {
-                    document.execCommand('copy');
-                    showStatus('✓ AI提示词已复制到剪贴板！在大语言模型中使用它来生成记忆卡片。', 'success');
-                } catch (err) {
-                    showStatus('复制失败。请手动复制：' + promptText, 'error');
-                }
-                document.body.removeChild(textarea);
+                alert('QQ: ' + qqNumber);
             });
-        }
-
-        function processPastedContent() {
-            const textarea = document.getElementById('pasteArea');
-            const text = textarea.value.trim();
-            
-            if (!text) {
-                alert('请先粘贴CSV内容！');
-                return;
-            }
-
-            showStatus('正在处理粘贴的内容...', 'info');
-
-            try {
-                const lines = text.split(/\r?\n/).filter(line => line.trim());
-                const cards = [];
-                
-                for (let line of lines) {
-                    line = line.trim();
-                    if (!line) continue;
-                    
-                    const regex = /"([^"]*)"|([^,]+)/g;
-                    const parts = [];
-                    let match;
-                    
-                    while ((match = regex.exec(line)) !== null) {
-                        parts.push(match[1] !== undefined ? match[1] : match[2]);
-                    }
-                    
-                    if (parts.length >= 2) {
-                        const front = parts[0].trim();
-                        const back = parts[1].trim();
-                        
-                        if (front && back) {
-                            cards.push({ front, back });
-                        }
-                    }
-                }
-
-                console.log('从粘贴内容解析的卡片数：', cards.length);
-                
-                if (cards.length > 0) {
-                    showStatus(`已解析 ${cards.length} 张卡片。请输入名称...`, 'info');
-                    
-                    setTimeout(() => {
-                        const setName = prompt(`找到 ${cards.length} 张记忆卡片！\n\n请为此卡片组命名：`, '我的记忆卡片');
-                        
-                        if (setName && setName.trim()) {
-                            showStatus('正在保存卡片组...', 'info');
-                            
-                            const newSet = {
-                                id: Date.now().toString(),
-                                name: setName.trim(),
-                                cards: cards,
-                                createdAt: Date.now()
-                            };
-
-                            flashcardSets.push(newSet);
-                            
-                            if (saveFlashcardSets()) {
-                                loadFlashcardSets();
-                                showStatus(`✓ 成功创建 ${cards.length} 张卡片为"${setName}"！`, 'success');
-                                textarea.value = '';
-                            } else {
-                                showStatus('保存卡片组失败。存储空间可能已满。', 'error');
-                                flashcardSets.pop();
-                            }
-                        } else {
-                            showStatus('已取消导入', 'error');
-                        }
-                    }, 100);
-                } else {
-                    showStatus('未找到有效的卡片。请检查CSV格式。', 'error');
-                }
-            } catch (error) {
-                console.error('处理粘贴内容时出错：', error);
-                showStatus(`错误：${error.message}`, 'error');
-            }
         }
     </script>
 </body>
