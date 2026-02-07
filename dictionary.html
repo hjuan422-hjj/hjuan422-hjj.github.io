@@ -84,7 +84,41 @@
         .search-box {
             display: flex;
             gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .search-controls {
+            display: flex;
+            gap: 10px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        #dictionarySelect {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            background: white;
+        }
+
+        .search-btn {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        @media (max-width: 600px) {
+            .search-controls {
+                flex-direction: column;
+            }
+            
+            #dictionarySelect,
+            .search-btn {
+                width: 100%;
+            }
         }
 
         input[type="text"] {
@@ -226,13 +260,16 @@
                         id="wordInput" 
                         placeholder="Enter an English word..."
                         onkeypress="handleKeyPress(event)"
+                        style="width: 100%;"
                     >
-                    <select id="dictionarySelect" style="padding: 15px; font-size: 16px; border: 2px solid #e9ecef; border-radius: 8px; cursor: pointer;">
+                </div>
+                <div class="search-controls">
+                    <select id="dictionarySelect">
                         <option value="iciba">iCiba</option>
                         <option value="quword">Quword</option>
                         <option value="merriam">Merriam-Webster</option>
                     </select>
-                    <button onclick="searchWord()">Search</button>
+                    <button onclick="searchWord()" class="search-btn">Search</button>
                 </div>
             </div>
             <div class="result-container" id="resultContainer">
