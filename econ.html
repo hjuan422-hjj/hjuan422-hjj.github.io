@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premium Economics Journals</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f5f0e8;
+    --parchment: #ede5d0;
+    --ink: #1a1208;
+    --sepia: #5c3d1e;
+    --gold: #b8860b;
+    --gold-light: #d4a843;
+    --rust: #8b3a0f;
+    --border: rgba(92,61,30,0.25);
+    --shadow: rgba(26,18,8,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--cream);
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(184,134,11,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(139,58,15,0.05) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    font-family: 'Source Serif 4', Georgia, serif;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  header {
+    background: var(--ink);
+    padding: 56px 40px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(184,134,11,0.04) 60px, rgba(184,134,11,0.04) 61px);
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 10%; right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .header-eyebrow {
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    opacity: 0.8;
+    margin-bottom: 18px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 900;
+    color: var(--cream);
+    line-height: 1.1;
+    margin-bottom: 14px;
+  }
+  h1 em { color: var(--gold-light); font-style: italic; }
+
+  .header-sub {
+    font-size: 15px;
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(245,240,232,0.5);
+    margin-bottom: 28px;
+  }
+
+  /* Tab bar */
+  .tab-bar {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 22px;
+  }
+  .tab-btn {
+    background: transparent;
+    border: 1px solid rgba(184,134,11,0.4);
+    color: var(--gold-light);
+    font-family: 'Source Serif 4', serif;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    padding: 9px 26px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab-btn:hover { background: rgba(184,134,11,0.12); }
+  .tab-btn.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .tab-btn.chinese-btn {
+    border-color: rgba(180,60,60,0.5);
+    color: #e8a0a0;
+  }
+  .tab-btn.chinese-btn:hover { background: rgba(139,26,26,0.15); }
+  .tab-btn.chinese-btn.active {
+    background: #8b1a1a;
+    border-color: #8b1a1a;
+    color: var(--cream);
+  }
+
+  /* Filter + search (international only) */
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+  .filter-btn {
+    background: transparent;
+    border: 1px solid rgba(184,134,11,0.4);
+    color: var(--gold-light);
+    font-family: 'Source Serif 4', serif;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    padding: 7px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .search-wrap {
+    max-width: 460px;
+    margin: 20px auto 0;
+    position: relative;
+    z-index: 1;
+  }
+  .search-wrap input {
+    width: 100%;
+    background: rgba(245,240,232,0.07);
+    border: 1px solid rgba(184,134,11,0.3);
+    color: var(--cream);
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    padding: 10px 18px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-wrap input::placeholder { color: rgba(245,240,232,0.3); font-style: italic; }
+  .search-wrap input:focus { border-color: var(--gold); }
+
+  main { max-width: 960px; margin: 0 auto; padding: 52px 24px 0; }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* Tier sections */
+  .tier-section { margin-bottom: 52px; animation: fadeUp 0.4s ease both; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .tier-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .tier-header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0;
+    width: 80px; height: 2px;
+    background: var(--gold);
+  }
+
+  .tier-badge { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; line-height: 1; }
+  .tier-T  .tier-badge { color: var(--ink); }
+  .tier-Ap .tier-badge { color: var(--sepia); }
+  .tier-A  .tier-badge { color: #6b4c2a; }
+  .tier-Am .tier-badge { color: #8a6540; }
+  .tier-label { font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); font-weight: 300; }
+  .tier-count { margin-left: auto; font-size: 12px; color: rgba(26,18,8,0.4); font-style: italic; }
+
+  .journal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+
+  .journal-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(255,252,245,0.7);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--ink);
+    transition: all 0.22s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .journal-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: transparent;
+    transition: background 0.2s;
+  }
+  .journal-card:hover {
+    background: rgba(255,252,245,1);
+    border-color: rgba(184,134,11,0.5);
+    transform: translateX(3px);
+    box-shadow: -3px 3px 16px var(--shadow);
+  }
+  .journal-card:hover::before { background: var(--gold); }
+
+  .card-num { font-family: 'Playfair Display', serif; font-size: 11px; color: rgba(26,18,8,0.3); min-width: 22px; text-align: right; }
+  .card-name { font-size: 13.5px; line-height: 1.35; flex: 1; }
+  .card-arrow { font-size: 12px; color: var(--gold); opacity: 0; transition: opacity 0.2s, transform 0.2s; transform: translateX(-4px); }
+  .journal-card:hover .card-arrow { opacity: 1; transform: translateX(0); }
+
+  .tier-T .journal-card { background: var(--ink); border-color: rgba(184,134,11,0.2); color: var(--cream); }
+  .tier-T .journal-card:hover { background: #2a1e0a; border-color: var(--gold); box-shadow: -3px 3px 20px rgba(184,134,11,0.2); }
+  .tier-T .card-num { color: rgba(245,240,232,0.25); }
+
+  /* Chinese journals view */
+  .chinese-header { text-align: center; margin-bottom: 40px; animation: fadeUp 0.4s ease both; }
+  .chinese-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .chinese-header p { font-style: italic; color: rgba(26,18,8,0.45); font-size: 14px; }
+  .chinese-header::after {
+    content: '';
+    display: block;
+    width: 60px; height: 2px;
+    background: #8b1a1a;
+    margin: 16px auto 0;
+  }
+
+  .chinese-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 12px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .chinese-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 20px;
+    background: rgba(255,252,245,0.8);
+    border: 1px solid rgba(139,26,26,0.2);
+    text-decoration: none;
+    color: var(--ink);
+    transition: all 0.22s ease;
+    position: relative;
+  }
+  .chinese-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: transparent;
+    transition: background 0.2s;
+  }
+  .chinese-card:hover {
+    background: #fff;
+    border-color: rgba(139,26,26,0.45);
+    transform: translateX(3px);
+    box-shadow: -3px 3px 16px rgba(139,26,26,0.1);
+  }
+  .chinese-card:hover::before { background: #8b1a1a; }
+
+  .chinese-num { font-family: 'Playfair Display', serif; font-size: 11px; color: rgba(139,26,26,0.35); min-width: 22px; text-align: right; }
+  .chinese-name { font-size: 17px; line-height: 1.4; flex: 1; }
+  .chinese-arrow { font-size: 12px; color: #8b1a1a; opacity: 0; transition: opacity 0.2s, transform 0.2s; transform: translateX(-4px); }
+  .chinese-card:hover .chinese-arrow { opacity: 1; transform: translateX(0); }
+
+  .hidden { display: none !important; }
+  .no-results { text-align: center; padding: 60px 20px; color: rgba(26,18,8,0.4); font-style: italic; font-size: 16px; display: none; }
+  footer { text-align: center; padding-top: 40px; font-size: 12px; color: rgba(26,18,8,0.35); letter-spacing: 0.05em; font-style: italic; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-eyebrow">Academic Resource Directory</div>
+  <h1>Premium <em>Economics</em> Journals</h1>
+  <p class="header-sub">Ranked from Tier T to A− · Click any journal to visit its website</p>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" data-view="international">International Journals</button>
+    <button class="tab-btn chinese-btn" data-view="chinese">中文期刊 Chinese Journals</button>
+  </div>
+
+  <div id="intl-controls">
+    <div class="filter-bar">
+      <button class="filter-btn active" data-tier="all">All Tiers</button>
+      <button class="filter-btn" data-tier="T">T</button>
+      <button class="filter-btn" data-tier="A+">A+</button>
+      <button class="filter-btn" data-tier="A">A</button>
+      <button class="filter-btn" data-tier="A-">A−</button>
+    </div>
+    <div class="search-wrap">
+      <input type="text" id="search" placeholder="Search journals…" autocomplete="off">
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- INTERNATIONAL VIEW -->
+  <div class="view active" id="view-international">
+    <div class="no-results" id="noResults">No journals match your search.</div>
+
+    <section class="tier-section tier-T" data-tier="T">
+      <div class="tier-header">
+        <span class="tier-badge">T</span>
+        <span class="tier-label">Top Tier</span>
+        <span class="tier-count">5 journals</span>
+      </div>
+      <div class="journal-grid">
+        <a class="journal-card" href="https://www.aeaweb.org/journals/aer" target="_blank"><span class="card-num">1</span><span class="card-name">American Economic Review</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.econometricsociety.org/publications/econometrica" target="_blank"><span class="card-num">2</span><span class="card-name">Econometrica</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.journals.uchicago.edu/toc/jpe/current" target="_blank"><span class="card-num">3</span><span class="card-name">Journal of Political Economy</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://academic.oup.com/qje" target="_blank"><span class="card-num">4</span><span class="card-name">Quarterly Journal of Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://academic.oup.com/restud" target="_blank"><span class="card-num">5</span><span class="card-name">Review of Economic Studies</span><span class="card-arrow">→</span></a>
+      </div>
+    </section>
+
+    <section class="tier-section tier-Ap" data-tier="A+">
+      <div class="tier-header">
+        <span class="tier-badge">A+</span>
+        <span class="tier-label">Excellent</span>
+        <span class="tier-count">18 journals</span>
+      </div>
+      <div class="journal-grid">
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/journal-of-economic-theory" target="_blank"><span class="card-num">1</span><span class="card-name">Journal of Economic Theory</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://academic.oup.com/ej" target="_blank"><span class="card-num">2</span><span class="card-name">Economic Journal</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/games-and-economic-behavior" target="_blank"><span class="card-num">3</span><span class="card-name">Games and Economic Behavior</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/14682354" target="_blank"><span class="card-num">4</span><span class="card-name">International Economic Review</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/journal-of-econometrics" target="_blank"><span class="card-num">5</span><span class="card-name">Journal of Econometrics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/journal-of-international-economics" target="_blank"><span class="card-num">6</span><span class="card-name">Journal of International Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.journals.uchicago.edu/toc/jole/current" target="_blank"><span class="card-num">7</span><span class="card-name">Journal of Labor Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/journal-of-monetary-economics" target="_blank"><span class="card-num">8</span><span class="card-name">Journal of Monetary Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/journal-of-public-economics" target="_blank"><span class="card-num">9</span><span class="card-name">Journal of Public Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://academic.oup.com/jeea" target="_blank"><span class="card-num">10</span><span class="card-name">Journal of the European Economic Association</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/17562171" target="_blank"><span class="card-num">11</span><span class="card-name">Rand Journal of Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://direct.mit.edu/rest" target="_blank"><span class="card-num">12</span><span class="card-name">Review of Economics and Statistics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://econtheory.org/" target="_blank"><span class="card-num">13</span><span class="card-name">Theoretical Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.aeaweb.org/journals/jel" target="_blank"><span class="card-num">14</span><span class="card-name">Journal of Economic Literature</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.aeaweb.org/journals/jep" target="_blank"><span class="card-num">15</span><span class="card-name">Journal of Economic Perspectives</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.apa.org/pubs/journals/psp" target="_blank"><span class="card-num">16</span><span class="card-name">Journal of Personality and Social Psychology</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://link.springer.com/journal/10887" target="_blank"><span class="card-num">17</span><span class="card-name">Journal of Economic Growth</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/14678276" target="_blank"><span class="card-num">18</span><span class="card-name">American Journal of Agricultural Economics</span><span class="card-arrow">→</span></a>
+      </div>
+    </section>
+
+    <section class="tier-section tier-A" data-tier="A">
+      <div class="tier-header">
+        <span class="tier-badge">A</span>
+        <span class="tier-label">Very Good</span>
+        <span class="tier-count">30 journals</span>
+      </div>
+      <div class="journal-grid">
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/journal-of-development-economics" target="_blank"><span class="card-num">1</span><span class="card-name">Journal of Development Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.aeaweb.org/journals/app" target="_blank"><span class="card-num">2</span><span class="card-name">AEJ: Applied Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.aeaweb.org/journals/pol" target="_blank"><span class="card-num">3</span><span class="card-name">AEJ: Economic Policy</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.aeaweb.org/journals/mac" target="_blank"><span class="card-num">4</span><span class="card-name">AEJ: Macroeconomics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.aeaweb.org/journals/mic" target="_blank"><span class="card-num">5</span><span class="card-name">AEJ: Microeconomics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://link.springer.com/journal/10693" target="_blank"><span class="card-num">6</span><span class="card-name">Journal of Business and Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/10991255" target="_blank"><span class="card-num">7</span><span class="card-name">Journal of Applied Econometrics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/journal-of-economic-dynamics-and-control" target="_blank"><span class="card-num">8</span><span class="card-name">Journal of Economic Dynamics and Control</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/journal-of-environmental-economics-and-management" target="_blank"><span class="card-num">9</span><span class="card-name">Journal of Environmental Economics and Management</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/14680084" target="_blank"><span class="card-num">10</span><span class="card-name">Oxford Bulletin of Economics and Statistics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.journals.uchicago.edu/toc/jaere/current" target="_blank"><span class="card-num">11</span><span class="card-name">Journal of the Association of Environmental and Resource Economists</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/15405982" target="_blank"><span class="card-num">12</span><span class="card-name">Canadian Journal of Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.cambridge.org/core/journals/econometric-theory" target="_blank"><span class="card-num">13</span><span class="card-name">Econometric Theory</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://link.springer.com/journal/199" target="_blank"><span class="card-num">14</span><span class="card-name">Economic Theory</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://link.springer.com/journal/10683" target="_blank"><span class="card-num">15</span><span class="card-name">Experimental Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.tandfonline.com/journals/ubes20" target="_blank"><span class="card-num">16</span><span class="card-name">Journal of Business & Economic Statistics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://le.uwpress.org/" target="_blank"><span class="card-num">17</span><span class="card-name">Land Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/journal-of-mathematical-economics" target="_blank"><span class="card-num">18</span><span class="card-name">Journal of Mathematical Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/journal-of-economic-behavior-and-organization" target="_blank"><span class="card-num">19</span><span class="card-name">Journal of Economic Behavior and Organization</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.journals.uchicago.edu/toc/jle/current" target="_blank"><span class="card-num">20</span><span class="card-name">Journal of Law and Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/journal-of-urban-economics" target="_blank"><span class="card-num">21</span><span class="card-name">Journal of Urban Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/international-journal-of-industrial-organization" target="_blank"><span class="card-num">22</span><span class="card-name">International Journal of Industrial Organization</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://link.springer.com/journal/10640" target="_blank"><span class="card-num">23</span><span class="card-name">Environmental and Resource Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/14779552" target="_blank"><span class="card-num">24</span><span class="card-name">Journal of Agricultural Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/14678489" target="_blank"><span class="card-num">25</span><span class="card-name">Australian Journal of Agricultural and Resource Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/17447976" target="_blank"><span class="card-num">26</span><span class="card-name">Canadian Journal of Agricultural Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/15740862" target="_blank"><span class="card-num">27</span><span class="card-name">Agricultural Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://academic.oup.com/erae" target="_blank"><span class="card-num">28</span><span class="card-name">European Review of Agricultural Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/food-policy" target="_blank"><span class="card-num">29</span><span class="card-name">Food Policy</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://jareonline.org/" target="_blank"><span class="card-num">30</span><span class="card-name">Journal of Agricultural and Resource Economics</span><span class="card-arrow">→</span></a>
+      </div>
+    </section>
+
+    <section class="tier-section tier-Am" data-tier="A-">
+      <div class="tier-header">
+        <span class="tier-badge">A−</span>
+        <span class="tier-label">Good</span>
+        <span class="tier-count">52 journals</span>
+      </div>
+      <div class="journal-grid">
+        <a class="journal-card" href="https://link.springer.com/journal/355" target="_blank"><span class="card-num">1</span><span class="card-name">Social Choice and Welfare</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://link.springer.com/journal/182" target="_blank"><span class="card-num">2</span><span class="card-name">International Journal of Game Theory</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/14657295" target="_blank"><span class="card-num">3</span><span class="card-name">Economic Inquiry</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://academic.oup.com/wber" target="_blank"><span class="card-num">4</span><span class="card-name">World Bank Economic Review</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://link.springer.com/journal/11166" target="_blank"><span class="card-num">5</span><span class="card-name">Journal of Risk and Uncertainty</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://link.springer.com/journal/11127" target="_blank"><span class="card-num">6</span><span class="card-name">Public Choice</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/ecological-economics" target="_blank"><span class="card-num">7</span><span class="card-name">Ecological Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/14680335" target="_blank"><span class="card-num">8</span><span class="card-name">Economica</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.tandfonline.com/journals/raec20" target="_blank"><span class="card-num">9</span><span class="card-name">Applied Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://academic.oup.com/jleo" target="_blank"><span class="card-num">10</span><span class="card-name">Journal of Law Economics and Organization</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/14676451" target="_blank"><span class="card-num">11</span><span class="card-name">Journal of Industrial Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.cambridge.org/core/journals/journal-of-economic-history" target="_blank"><span class="card-num">12</span><span class="card-name">Journal of Economic History</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://academic.oup.com/oep" target="_blank"><span class="card-num">13</span><span class="card-name">Oxford Economic Papers</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/journal-of-comparative-economics" target="_blank"><span class="card-num">14</span><span class="card-name">Journal of Comparative Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/world-development" target="_blank"><span class="card-num">15</span><span class="card-name">World Development</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/14679396" target="_blank"><span class="card-num">16</span><span class="card-name">Review of International Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/21508572" target="_blank"><span class="card-num">17</span><span class="card-name">Southern Economic Journal</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/explorations-in-economic-history" target="_blank"><span class="card-num">18</span><span class="card-name">Explorations in Economic History</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/14754932" target="_blank"><span class="card-num">19</span><span class="card-name">Economic Record</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/14657287" target="_blank"><span class="card-num">20</span><span class="card-name">Contemporary Economic Policy</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://link.springer.com/journal/148" target="_blank"><span class="card-num">21</span><span class="card-name">Journal of Population Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://link.springer.com/journal/11151" target="_blank"><span class="card-num">22</span><span class="card-name">Review of Industrial Organization</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.mohrsiebeck.com/en/journal/journal-of-institutional-and-theoretical-economics-jite" target="_blank"><span class="card-num">23</span><span class="card-name">Journal of Institutional and Theoretical Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/14679485" target="_blank"><span class="card-num">24</span><span class="card-name">Scottish Journal of Political Economy</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/journal-of-business-research" target="_blank"><span class="card-num">25</span><span class="card-name">Journal of Business Research</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/journal-of-macroeconomics" target="_blank"><span class="card-num">26</span><span class="card-name">Journal of Macroeconomics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/14754991" target="_blank"><span class="card-num">27</span><span class="card-name">Review of Income and Wealth</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://academic.oup.com/oxrep" target="_blank"><span class="card-num">28</span><span class="card-name">Oxford Review of Economic Policy</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/economic-modelling" target="_blank"><span class="card-num">29</span><span class="card-name">Economic Modelling</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/journal-of-health-economics" target="_blank"><span class="card-num">30</span><span class="card-name">Journal of Health Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/regional-science-and-urban-economics" target="_blank"><span class="card-num">31</span><span class="card-name">Regional Science and Urban Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/15309134" target="_blank"><span class="card-num">32</span><span class="card-name">Journal of Economics and Management Strategy</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/14679701" target="_blank"><span class="card-num">33</span><span class="card-name">World Economy</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://link.springer.com/journal/11187" target="_blank"><span class="card-num">34</span><span class="card-name">Small Business Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/14680289" target="_blank"><span class="card-num">35</span><span class="card-name">Economic History Review</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://academic.oup.com/cje" target="_blank"><span class="card-num">36</span><span class="card-name">Cambridge Journal of Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://academic.oup.com/wbro" target="_blank"><span class="card-num">37</span><span class="card-name">World Bank Research Observer</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.iaee.org/energyjournal/" target="_blank"><span class="card-num">38</span><span class="card-name">Energy Journal</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://link.springer.com/journal/10290" target="_blank"><span class="card-num">39</span><span class="card-name">Review of World Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.journals.uchicago.edu/toc/edcc/current" target="_blank"><span class="card-num">40</span><span class="card-name">Economic Development & Cultural Change</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://link.springer.com/journal/181" target="_blank"><span class="card-num">41</span><span class="card-name">Empirical Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.jstor.org/journal/jtransporteconom" target="_blank"><span class="card-num">42</span><span class="card-name">Journal of Transport Economics and Policy</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://link.springer.com/journal/11149" target="_blank"><span class="card-num">43</span><span class="card-name">Journal of Regulatory Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/journal-of-housing-economics" target="_blank"><span class="card-num">44</span><span class="card-name">Journal of Housing Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.cambridge.org/core/journals/economics-and-philosophy" target="_blank"><span class="card-num">45</span><span class="card-name">Economics and Philosophy</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/resource-and-energy-economics" target="_blank"><span class="card-num">46</span><span class="card-name">Resource and Energy Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/journal-of-policy-modeling" target="_blank"><span class="card-num">47</span><span class="card-name">Journal of Policy Modelling</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://onlinelibrary.wiley.com/journal/17461049" target="_blank"><span class="card-num">48</span><span class="card-name">Developing Economies</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/china-economic-review" target="_blank"><span class="card-num">49</span><span class="card-name">China Economic Review</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.journals.uchicago.edu/toc/mre/current" target="_blank"><span class="card-num">50</span><span class="card-name">Marine Resource Economics</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.emerald.com/caer" target="_blank"><span class="card-num">51</span><span class="card-name">China Agricultural Economic Review</span><span class="card-arrow">→</span></a>
+        <a class="journal-card" href="https://www.sciencedirect.com/journal/economics-letters" target="_blank"><span class="card-num">52</span><span class="card-name">Economics Letters</span><span class="card-arrow">→</span></a>
+      </div>
+    </section>
+
+    <footer>105 international journals across 4 tiers · Links open in a new tab</footer>
+  </div>
+
+  <!-- CHINESE JOURNALS VIEW -->
+  <div class="view" id="view-chinese">
+    <div class="chinese-header">
+      <h2>中文经济学期刊</h2>
+      <p>Premium Chinese Economics Journals · via CNKI</p>
+    </div>
+    <div class="chinese-grid">
+      <a class="chinese-card" href="https://navi.cnki.net/knavi/detail?p=HKsQWfZ0XHUkOwWPTNb4TofxhM2RDPF-CXoYSffMjsuv8DMWY8bxVoTavu1kuXWDSoAeB8l6L1JHVS6-LUheYQ28CBsW0tbOHJ_J4mqzeszL19SLI0FJAQ==&uniplatform=NZKPT&language=CHS" target="_blank"><span class="chinese-num">1</span><span class="chinese-name">中国社会科学</span><span class="chinese-arrow">→</span></a>
+      <a class="chinese-card" href="https://navi.cnki.net/knavi/detail?p=HKsQWfZ0XHVdwmlg9rT92OzZ4027sLReGFw4rJAikIwdcS8AvpZ2FcyfNPJh7Cqg0oUEQ-oWiyGO_aQYdRIa1hvTZGVnSYTXnqaRHwJ74iNvowWnBiHkEA==&uniplatform=NZKPT&language=CHS" target="_blank"><span class="chinese-num">2</span><span class="chinese-name">经济研究</span><span class="chinese-arrow">→</span></a>
+      <a class="chinese-card" href="https://navi.cnki.net/knavi/detail?p=HKsQWfZ0XHV0wA_bkrnJk-CNIq6uk5dwckeyXr4BoGV7juNpnwkAPQSPdy5kx8onWqzluwg9uf-s9teL1PwnfX_ohQwqnrCzdc1586FgzxQCNPxzRyqbzA==&uniplatform=NZKPT&language=CHS" target="_blank"><span class="chinese-num">3</span><span class="chinese-name">经济学（季刊）</span><span class="chinese-arrow">→</span></a>
+      <a class="chinese-card" href="https://navi.cnki.net/knavi/detail?p=HKsQWfZ0XHXzR-HezUC0l7cRjhRjNp45zy51Jg_5KQc3A6BM_W-r1La63QnZbAerzrdepYIJ1zwIS5pTzsZqSI_lhZMYxQyUxfhTjWuXD1WYwxUZYUgmSg==&uniplatform=NZKPT&language=CHS" target="_blank"><span class="chinese-num">4</span><span class="chinese-name">数量经济技术经济研究</span><span class="chinese-arrow">→</span></a>
+      <a class="chinese-card" href="https://navi.cnki.net/knavi/detail?p=HKsQWfZ0XHURcYnqeYtbZj2GTiNKUV092RuPNQIhaLJgX4snn_g-jYc5HToLgrnokUCJACQ0DWRhT0WrrN-x-tszP4wJFCHGabjk3pkw8m1FIx0a55SdCg==&uniplatform=NZKPT&language=CHS" target="_blank"><span class="chinese-num">5</span><span class="chinese-name">会计研究</span><span class="chinese-arrow">→</span></a>
+      <a class="chinese-card" href="https://navi.cnki.net/knavi/detail?p=HKsQWfZ0XHU6BRe-PImhJW_9Bby_XB_Rw0oxMPN6qVs3esmG84LnaRFUPc47rKKoztQrJJghj9bRBJQurvMpKzkWlNos_AxLnzJB7p7Q1fvq2Q-6x0zqvQ==&uniplatform=NZKPT&language=CHS" target="_blank"><span class="chinese-num">6</span><span class="chinese-name">南开管理评论</span><span class="chinese-arrow">→</span></a>
+      <a class="chinese-card" href="https://navi.cnki.net/knavi/detail?p=HKsQWfZ0XHUT_OsLdhjbf4SBFSXOWV1ozEbVkUTII8Gf1b3Oc5DLeo5FWslUYkNFChsV-mFb-VwF8Hb15U4-whJMuJJVjpJRCxLYNJaJ2D8CHHsaEJR__A==&uniplatform=NZKPT&language=CHS" target="_blank"><span class="chinese-num">7</span><span class="chinese-name">中国农村经济</span><span class="chinese-arrow">→</span></a>
+      <a class="chinese-card" href="https://navi.cnki.net/knavi/detail?p=HKsQWfZ0XHUYjHW2JEAN1Y5X0WtscKme3Bdzqkq0IF2CtB_Dm9N5cex5ACuoe52VrcAnMfFrFANWv8XjPgxVzzAWS0sUkspkOmZIhfHQdJIjhpzt2Zae1g==&uniplatform=NZKPT&language=CHS" target="_blank"><span class="chinese-num">8</span><span class="chinese-name">中国农村观察</span><span class="chinese-arrow">→</span></a>
+      <a class="chinese-card" href="https://navi.cnki.net/knavi/detail?p=HKsQWfZ0XHUEeug7ikSWqJgR6d1inT9-QOvaP9OyikhjGAdQlAmv-tBpr14uE3tLbrLh9MH7HyieihiohA2Ts3n1ZmR4T9L6bLI3QnalGmoYvtXzM7Ft7w==&uniplatform=NZKPT&language=CHS" target="_blank"><span class="chinese-num">9</span><span class="chinese-name">农业经济问题</span><span class="chinese-arrow">→</span></a>
+      <a class="chinese-card" href="https://navi.cnki.net/knavi/detail?p=HKsQWfZ0XHUpen4zTxPdLaVNfC_6ycPefShQtND_TB3pGbwkKQ1KO7kuAbCiafex6f_vbABWfLNE1oaS0h1CPeH2xFMbTA5yAnk4o_xXblH-7Uy51KNZ7Q==&uniplatform=NZKPT&language=CHS" target="_blank"><span class="chinese-num">10</span><span class="chinese-name">农业技术经济</span><span class="chinese-arrow">→</span></a>
+    </div>
+    <footer style="margin-top:40px">10 Chinese journals · Links open CNKI in a new tab</footer>
+  </div>
+
+</main>
+
+<script>
+  // Tab switching
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const view = btn.dataset.view;
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-' + view).classList.add('active');
+      document.getElementById('intl-controls').style.display = view === 'international' ? 'block' : 'none';
+    });
+  });
+
+  // Tier filter
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filterAll();
+    });
+  });
+
+  // Search
+  document.getElementById('search').addEventListener('input', filterAll);
+
+  function filterAll() {
+    const tier = document.querySelector('.filter-btn.active').dataset.tier;
+    const q = document.getElementById('search').value.toLowerCase().trim();
+    let anyVisible = false;
+
+    document.querySelectorAll('.tier-section').forEach(sec => {
+      const tierMatch = tier === 'all' || sec.dataset.tier === tier;
+      if (!tierMatch) { sec.classList.add('hidden'); return; }
+      let secHasMatch = false;
+      sec.querySelectorAll('.journal-card').forEach(card => {
+        const match = !q || card.querySelector('.card-name').textContent.toLowerCase().includes(q);
+        card.classList.toggle('hidden', !match);
+        if (match) secHasMatch = true;
+      });
+      sec.classList.toggle('hidden', !secHasMatch);
+      if (secHasMatch) anyVisible = true;
+    });
+
+    document.getElementById('noResults').style.display = anyVisible ? 'none' : 'block';
+  }
+</script>
+</body>
+</html>
