@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trending Papers — Research Navigator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0f0a;
+    --surface: #131710;
+    --card: #181d14;
+    --border: #252d1f;
+    --accent: #a8c572;
+    --accent-dim: #6e8a45;
+    --accent-glow: rgba(168, 197, 114, 0.12);
+    --text: #dde8cc;
+    --text-muted: #7a8f65;
+    --text-dim: #4a5a38;
+    --tag-bg: #1e2619;
+    --highlight: #c8e08a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Atmospheric background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 80% 10%, rgba(100, 140, 60, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 20% 80%, rgba(80, 120, 40, 0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Subtle noise texture */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+  }
+
+  /* Header */
+  header {
+    padding: 4rem 0 3rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 3rem;
+  }
+
+  .header-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent-dim);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .header-label::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 1px;
+    background: var(--accent-dim);
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .header-desc {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    max-width: 480px;
+    line-height: 1.7;
+  }
+
+  .header-actions {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.4rem;
+    background: var(--accent);
+    color: var(--bg);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    background: var(--highlight);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(168, 197, 114, 0.3);
+  }
+
+  .btn-primary svg { width: 14px; height: 14px; }
+
+  /* Section headers */
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--text);
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Field cards - top level */
+  .fields-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 3rem;
+  }
+
+  .field-card {
+    background: var(--card);
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .field-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+
+  .field-card:hover {
+    background: var(--surface);
+  }
+
+  .field-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .field-icon {
+    font-size: 1.4rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .field-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .field-arrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-top: auto;
+    transition: color 0.2s, transform 0.2s;
+  }
+
+  .field-card:hover .field-arrow {
+    color: var(--accent);
+    transform: translateX(3px);
+  }
+
+  /* Categories section */
+  .categories-section {
+    margin-bottom: 2rem;
+  }
+
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .cat-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 400;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cat-link::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--accent);
+    transform: scaleY(0);
+    transition: transform 0.2s ease;
+  }
+
+  .cat-link:hover {
+    background: var(--accent-glow);
+    border-color: var(--accent-dim);
+    color: var(--text);
+    padding-left: 1.25rem;
+  }
+
+  .cat-link:hover::before {
+    transform: scaleY(1);
+  }
+
+  .cat-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+
+  .cat-link:hover .cat-dot {
+    background: var(--accent);
+  }
+
+  .cat-tag {
+    margin-left: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: gap;
+    gap: 1rem;
+  }
+
+  .footer-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .footer-link {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent-dim);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+
+  .footer-link:hover { color: var(--accent); }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  header { animation: fadeUp 0.6s ease both; }
+  .fields-grid { animation: fadeUp 0.6s ease 0.1s both; }
+  .categories-section { animation: fadeUp 0.6s ease 0.2s both; }
+
+  /* Count badge */
+  .count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    padding: 0.1rem 0.4rem;
+    letter-spacing: 0.05em;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="header-label">Research Navigator</div>
+    <h1>Trending <em>Papers</em></h1>
+    <p class="header-desc">Navigate directly to trending academic papers across fields. Powered by OOIR — the Open Online Research Influence Ranking.</p>
+    <div class="header-actions">
+      <a href="https://ooir.org/" target="_blank" class="btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        All Trending Papers
+      </a>
+    </div>
+  </header>
+
+  <!-- Top-level Fields -->
+  <div class="section-header">
+    <span class="section-title">Browse by Field</span>
+    <div class="section-line"></div>
+    <span class="count-badge">4 fields</span>
+  </div>
+
+  <div class="fields-grid">
+    <a href="https://ooir.org/index.php?field=Agricultural+Sciences" target="_blank" class="field-card">
+      <div class="field-icon">🌾</div>
+      <div class="field-name">Agricultural Sciences</div>
+      <div class="field-arrow">→ ooir.org</div>
+    </a>
+    <a href="https://ooir.org/index.php?field=Economics+%26+Business" target="_blank" class="field-card">
+      <div class="field-icon">📈</div>
+      <div class="field-name">Economics & Business</div>
+      <div class="field-arrow">→ ooir.org</div>
+    </a>
+    <a href="https://ooir.org/index.php?field=Environment+and+Ecology" target="_blank" class="field-card">
+      <div class="field-icon">🌿</div>
+      <div class="field-name">Environment & Ecology</div>
+      <div class="field-arrow">→ ooir.org</div>
+    </a>
+    <a href="https://ooir.org/index.php?field=Social+Sciences" target="_blank" class="field-card">
+      <div class="field-icon">🔬</div>
+      <div class="field-name">Social Sciences</div>
+      <div class="field-arrow">→ ooir.org</div>
+    </a>
+  </div>
+
+  <!-- Economics & Business Categories -->
+  <div class="categories-section">
+    <div class="section-header">
+      <span class="section-title">Economics & Business — Categories</span>
+      <div class="section-line"></div>
+      <span class="count-badge">20 categories</span>
+    </div>
+
+    <div class="categories-grid">
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Agricultural+Economics+%26+Policy" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Agricultural Economics & Policy
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Area+Studies" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Area Studies
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Business" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Business
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Business%2C+Finance" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Business, Finance
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Communication" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Communication
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Demography" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Demography
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Development+Studies" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Development Studies
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Ecology" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Ecology
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Economics" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Economics
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Environmental+Studies" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Environmental Studies
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Ethnic+Studies" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Ethnic Studies
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Forestry" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Forestry
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Geography" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Geography
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Health+Care+Sciences+%26+Services" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Health Care Sciences & Services
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Health+Policy+%26+Services" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Health Policy & Services
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Industrial+Relations+%26+Labor" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Industrial Relations & Labor
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Management" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Management
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Operations+Research+%26+Management+Science" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Operations Research & Management Science
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Public+Administration" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Public Administration
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Transportation" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Transportation
+        <span class="cat-tag">econ</span>
+      </a>
+      <a href="https://ooir.org/index.php?field=Economics+%26+Business&category=Urban+Studies" target="_blank" class="cat-link">
+        <span class="cat-dot"></span>
+        Urban Studies
+        <span class="cat-tag">econ</span>
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <span class="footer-text">Data source — ooir.org</span>
+    <a href="https://ooir.org/" target="_blank" class="footer-link">Open Online Research Influence Ranking →</a>
+  </footer>
+
+</div>
+</body>
+</html>
