@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BiographyQuest — The Game</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IM+Fell+English:ital@0;1&display=swap');
+
+  :root {
+    --ink: #1a1008;
+    --parchment: #f5ead8;
+    --parchment-dark: #e8d8b8;
+    --parchment-mid: #ede0c4;
+    --gold: #b8862a;
+    --gold-light: #d4a843;
+    --gold-pale: #f0d898;
+    --crimson: #8b1a1a;
+    --crimson-light: #a82020;
+    --teal: #1a5a5a;
+    --teal-light: #2a7a7a;
+    --shadow: rgba(26,16,8,0.18);
+    --shadow-strong: rgba(26,16,8,0.35);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Crimson Pro', Georgia, serif;
+    background: var(--ink);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* === BACKGROUND TEXTURE === */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, #2a1a08 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, #0a1a18 0%, transparent 60%),
+      radial-gradient(ellipse at 50% 50%, #1a1008 0%, #0a0805 100%);
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .app-container {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 40px 20px 60px;
+  }
+
+  /* === ORNAMENTAL DIVIDER === */
+  .ornament {
+    text-align: center;
+    color: var(--gold);
+    font-size: 1.2rem;
+    letter-spacing: 0.5em;
+    margin: 8px 0;
+    opacity: 0.7;
+  }
+
+  /* === HEADER === */
+  .site-header {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .site-header .eyebrow {
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+
+  .site-header h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(2.8rem, 7vw, 5rem);
+    font-weight: 900;
+    font-style: italic;
+    color: var(--parchment);
+    line-height: 1;
+    text-shadow: 0 4px 30px rgba(184,134,42,0.3), 0 0 80px rgba(184,134,42,0.1);
+    letter-spacing: -0.02em;
+  }
+
+  .site-header h1 span {
+    color: var(--gold-light);
+  }
+
+  .site-header .tagline {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--parchment-dark);
+    margin-top: 8px;
+    opacity: 0.8;
+  }
+
+  /* === CARD / BOOK PANEL === */
+  .book-panel {
+    background: var(--parchment);
+    border-radius: 2px;
+    max-width: 780px;
+    width: 100%;
+    box-shadow:
+      0 0 0 1px var(--gold),
+      0 0 0 4px rgba(184,134,42,0.15),
+      8px 12px 50px var(--shadow-strong),
+      -2px -2px 0 rgba(255,255,255,0.1) inset;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.8s ease 0.2s both;
+  }
+
+  .book-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--crimson), var(--gold), var(--teal), var(--gold), var(--crimson));
+  }
+
+  .book-panel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at top left, rgba(255,255,255,0.3) 0%, transparent 40%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .panel-content {
+    position: relative;
+    z-index: 1;
+    padding: 44px 52px;
+  }
+
+  @media (max-width: 600px) {
+    .panel-content { padding: 28px 24px; }
+  }
+
+  /* === UPLOAD SECTION === */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .section-subtitle {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1rem;
+    color: #5a4520;
+    margin-bottom: 28px;
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  .upload-zone {
+    border: 2px dashed var(--gold);
+    border-radius: 4px;
+    padding: 50px 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(184,134,42,0.04);
+    position: relative;
+  }
+
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--gold-light);
+    background: rgba(184,134,42,0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(184,134,42,0.15);
+  }
+
+  .upload-zone input[type=file] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .upload-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    display: block;
+    filter: sepia(1) saturate(0.5);
+  }
+
+  .upload-zone p {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .upload-zone small {
+    color: #7a6040;
+    font-size: 0.88rem;
+  }
+
+  .file-selected {
+    margin-top: 20px;
+    padding: 14px 20px;
+    background: rgba(26,90,90,0.08);
+    border-left: 3px solid var(--teal);
+    border-radius: 2px;
+    font-size: 0.95rem;
+    color: var(--teal);
+    font-family: 'Crimson Pro', serif;
+    display: none;
+  }
+
+  /* === BUTTONS === */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 13px 28px;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0);
+    transition: background 0.2s;
+  }
+
+  .btn:hover::after { background: rgba(255,255,255,0.08); }
+
+  .btn-gold {
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: var(--ink);
+    box-shadow: 0 4px 20px rgba(184,134,42,0.35), 0 1px 0 rgba(255,255,255,0.2) inset;
+  }
+
+  .btn-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(184,134,42,0.4);
+  }
+
+  .btn-crimson {
+    background: linear-gradient(135deg, var(--crimson), var(--crimson-light));
+    color: var(--parchment);
+    box-shadow: 0 4px 20px rgba(139,26,26,0.35);
+  }
+
+  .btn-crimson:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(139,26,26,0.4);
+  }
+
+  .btn-teal {
+    background: linear-gradient(135deg, var(--teal), var(--teal-light));
+    color: var(--parchment);
+    box-shadow: 0 4px 20px rgba(26,90,90,0.35);
+  }
+
+  .btn-teal:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(26,90,90,0.4);
+  }
+
+  .btn-ghost {
+    background: rgba(245,234,216,0.08);
+    color: var(--parchment);
+    border: 1.5px solid var(--gold);
+  }
+
+  .btn-ghost:hover {
+    background: rgba(184,134,42,0.25);
+    color: var(--gold-pale);
+  }
+
+  .btn-sm {
+    padding: 9px 18px;
+    font-size: 0.85rem;
+  }
+
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  .action-row {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+  }
+
+  /* === CSV FORMAT GUIDE === */
+  .format-guide {
+    margin-top: 30px;
+    border-top: 1px solid var(--parchment-dark);
+    padding-top: 22px;
+  }
+
+  .format-guide summary {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    color: var(--gold);
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .format-guide summary::-webkit-details-marker { display: none; }
+
+  .format-guide[open] summary::before { content: '▾'; }
+  .format-guide:not([open]) summary::before { content: '▸'; }
+
+  .col-table {
+    margin-top: 16px;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  .col-table th {
+    background: var(--parchment-dark);
+    padding: 8px 12px;
+    text-align: left;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+  }
+
+  .col-table td {
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--parchment-dark);
+    vertical-align: top;
+    line-height: 1.4;
+  }
+
+  .col-table tr:nth-child(even) td { background: rgba(0,0,0,0.03); }
+
+  .col-num {
+    font-weight: 700;
+    color: var(--gold);
+    font-family: 'Playfair Display', serif;
+    white-space: nowrap;
+  }
+
+  /* === SCREEN VISIBILITY SYSTEM === */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* === GAME SCREEN === */
+  .game-wrapper {
+    max-width: 800px;
+    width: 100%;
+  }
+
+  /* Chapter header */
+  .chapter-header {
+    text-align: center;
+    margin-bottom: 24px;
+    animation: fadeDown 0.5s ease both;
+  }
+
+  .chapter-label {
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+
+  .chapter-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    font-style: italic;
+    color: var(--parchment);
+    text-shadow: 0 2px 20px rgba(184,134,42,0.25);
+  }
+
+  /* Progress bar */
+  .progress-track {
+    width: 100%;
+    height: 3px;
+    background: rgba(245,234,216,0.15);
+    border-radius: 3px;
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    border-radius: 3px;
+    transition: width 0.6s ease;
+    box-shadow: 0 0 8px rgba(184,134,42,0.5);
+  }
+
+  /* Score badge */
+  .score-badge {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    background: rgba(184,134,42,0.15);
+    border: 1px solid rgba(184,134,42,0.4);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.85rem;
+    color: var(--gold-light);
+    z-index: 2;
+  }
+
+  .score-badge span { font-weight: 700; }
+
+  /* Page number */
+  .page-indicator {
+    text-align: center;
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.8rem;
+    color: rgba(245,234,216,0.4);
+    margin-bottom: 6px;
+    letter-spacing: 0.15em;
+  }
+
+  /* Situation text */
+  .situation-card {
+    background: var(--parchment);
+    position: relative;
+    border-radius: 2px;
+    box-shadow:
+      0 0 0 1px var(--gold),
+      8px 12px 50px var(--shadow-strong);
+    overflow: hidden;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .situation-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--crimson), var(--gold), var(--teal), var(--gold), var(--crimson));
+  }
+
+  .situation-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  .situation-inner {
+    position: relative;
+    z-index: 1;
+    padding: 40px 48px;
+  }
+
+  @media (max-width: 600px) {
+    .situation-inner { padding: 26px 22px; }
+  }
+
+  .situation-text {
+    font-family: 'IM Fell English', serif;
+    font-size: 1.12rem;
+    line-height: 1.85;
+    color: var(--ink);
+    white-space: pre-wrap;
+    margin-bottom: 30px;
+  }
+
+  /* Choices */
+  .choices-section {
+    border-top: 1px solid var(--parchment-dark);
+    padding-top: 24px;
+  }
+
+  .choices-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+
+  .choice-btn {
+    width: 100%;
+    text-align: left;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    background: var(--parchment-mid);
+    border: 1.5px solid var(--parchment-dark);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.05rem;
+    color: var(--ink);
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    line-height: 1.5;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .choice-btn::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: transparent;
+    transition: background 0.2s;
+  }
+
+  .choice-btn:hover:not(:disabled) {
+    border-color: var(--gold);
+    background: rgba(184,134,42,0.08);
+    transform: translateX(3px);
+  }
+
+  .choice-btn:hover:not(:disabled)::before { background: var(--gold); }
+
+  .choice-btn:disabled { cursor: default; }
+
+  .choice-letter {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--gold);
+    flex-shrink: 0;
+    min-width: 22px;
+    margin-top: 1px;
+  }
+
+  /* Answer states */
+  .choice-btn.correct {
+    background: rgba(26,90,90,0.1);
+    border-color: var(--teal);
+  }
+
+  .choice-btn.correct::before { background: var(--teal); }
+
+  .choice-btn.wrong {
+    background: rgba(139,26,26,0.08);
+    border-color: var(--crimson);
+  }
+
+  .choice-btn.wrong::before { background: var(--crimson); }
+
+  .choice-btn.correct-unselected {
+    background: rgba(26,90,90,0.05);
+    border-color: rgba(26,90,90,0.4);
+  }
+
+  .choice-btn.correct-unselected::before { background: rgba(26,90,90,0.4); }
+
+  .choice-result-icon {
+    margin-left: auto;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  /* Explanation */
+  .explanation-card {
+    margin-top: 20px;
+    padding: 20px 22px;
+    border-left: 3px solid var(--gold);
+    background: rgba(184,134,42,0.06);
+    border-radius: 0 3px 3px 0;
+    font-family: 'Crimson Pro', serif;
+    font-size: 1rem;
+    line-height: 1.65;
+    color: #3a2808;
+    animation: fadeIn 0.4s ease both;
+    display: none;
+  }
+
+  .explanation-card.show { display: block; }
+
+  .explanation-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .correct-badge {
+    display: inline-block;
+    background: var(--teal);
+    color: var(--parchment);
+    font-size: 0.78rem;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-family: 'Playfair Display', serif;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+    font-style: normal;
+  }
+
+  .wrong-badge {
+    display: inline-block;
+    background: var(--crimson);
+    color: var(--parchment);
+    font-size: 0.78rem;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-family: 'Playfair Display', serif;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+
+  /* Nav bar */
+  .game-nav {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    animation: fadeIn 0.4s ease 0.3s both;
+  }
+
+  .nav-left, .nav-right { display: flex; gap: 10px; }
+
+  /* Ghost buttons on dark game background need light text */
+  .game-nav .btn-ghost {
+    color: var(--parchment);
+    border-color: rgba(245,234,216,0.45);
+    background: rgba(245,234,216,0.07);
+  }
+
+  .game-nav .btn-ghost:hover {
+    background: rgba(245,234,216,0.15);
+    border-color: var(--gold-light);
+    color: var(--gold-pale);
+  }
+
+  /* === FINAL REPORT === */
+  .report-panel {
+    background: var(--parchment);
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px var(--gold), 8px 12px 50px var(--shadow-strong);
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .report-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--crimson), var(--gold), var(--teal), var(--gold), var(--crimson));
+  }
+
+  .report-inner {
+    padding: 48px 52px;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (max-width: 600px) { .report-inner { padding: 30px 22px; } }
+
+  .report-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    font-style: italic;
+    color: var(--ink);
+    margin-bottom: 6px;
+    text-align: center;
+  }
+
+  .report-subtitle {
+    text-align: center;
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: #5a4020;
+    margin-bottom: 36px;
+  }
+
+  .score-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 36px;
+    box-shadow: 0 8px 40px rgba(184,134,42,0.4), 0 0 0 8px rgba(184,134,42,0.1), 0 0 0 16px rgba(184,134,42,0.05);
+    position: relative;
+  }
+
+  .score-pct {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1;
+  }
+
+  .score-pct-label {
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.8rem;
+    color: rgba(26,16,8,0.7);
+    margin-top: 2px;
+  }
+
+  .score-rank {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--gold);
+    margin-bottom: 30px;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+  }
+
+  .stat-box {
+    flex: 1;
+    min-width: 100px;
+    padding: 16px;
+    background: var(--parchment-mid);
+    border: 1px solid var(--parchment-dark);
+    border-radius: 3px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .stat-label {
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.82rem;
+    color: #7a6040;
+    margin-top: 3px;
+  }
+
+  /* Review list */
+  .review-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--parchment-dark);
+    padding-bottom: 10px;
+  }
+
+  .review-item {
+    display: flex;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    align-items: flex-start;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .review-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+  .review-q { color: var(--ink); font-family: 'Crimson Pro', serif; }
+  .review-q strong { font-family: 'Playfair Display', serif; font-size: 0.88rem; display: block; margin-bottom: 2px; }
+  .review-q .chose { font-size: 0.85rem; color: #7a6040; font-style: italic; }
+
+  .report-actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 36px; }
+
+  /* === ANIMATIONS === */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(184,134,42,0.4); }
+    50%       { box-shadow: 0 0 0 10px rgba(184,134,42,0); }
+  }
+
+  /* Proceed only mode */
+  .proceed-only-msg {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: #7a6040;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: var(--parchment);
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.95rem;
+    border: 1px solid var(--gold);
+    opacity: 0;
+    transition: all 0.35s ease;
+    pointer-events: none;
+    z-index: 100;
+    white-space: nowrap;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+<div class="app-container">
+  <div id="gameScreen" class="screen active" style="width:100%;max-width:800px;">
+    <div class="chapter-header" id="chapterHeader">
+      <div class="chapter-label" id="chapterLabel">Chapter 1</div>
+      <div class="chapter-name" id="chapterName"></div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="page-indicator" id="pageIndicator"></div>
+    <div class="situation-card">
+      <div class="score-badge" id="scoreBadge">Score: <span id="scoreDisplay">0</span></div>
+      <div class="situation-inner">
+        <div class="situation-text" id="situationText"></div>
+        <div class="choices-section" id="choicesSection" style="display:none;">
+          <div class="choices-label">✦ Your Choice ✦</div>
+          <button class="choice-btn" id="choiceA" onclick="makeChoice(0)"><span class="choice-letter">A.</span><span id="choiceAText"></span><span class="choice-result-icon" id="iconA"></span></button>
+          <button class="choice-btn" id="choiceB" onclick="makeChoice(1)"><span class="choice-letter">B.</span><span id="choiceBText"></span><span class="choice-result-icon" id="iconB"></span></button>
+          <button class="choice-btn" id="choiceC" onclick="makeChoice(2)"><span class="choice-letter">C.</span><span id="choiceCText"></span><span class="choice-result-icon" id="iconC"></span></button>
+        </div>
+        <div class="proceed-only-msg" id="proceedMsg" style="display:none;">— Narration — proceed when ready —</div>
+        <div class="explanation-card" id="explanationCard">
+          <div class="explanation-label">✦ Historical Truth ✦</div>
+          <div id="resultBadge"></div>
+          <div id="explanationText"></div>
+        </div>
+      </div>
+    </div>
+    <div class="game-nav">
+      <div class="nav-left"><button class="btn btn-ghost btn-sm" id="prevBtn" onclick="navigate(-1)">◀ Prev</button></div>
+      <div class="nav-right">
+        <button class="btn btn-ghost btn-sm" onclick="saveProgress()">💾 Save</button>
+        <button class="btn btn-ghost btn-sm" onclick="confirmRestart()">↺ Restart</button>
+        <button class="btn btn-gold btn-sm" id="nextBtn" onclick="navigate(1)">Next ▶</button>
+      </div>
+    </div>
+  </div>
+  <div id="reportScreen" class="screen" style="width:100%;max-width:720px;">
+    <div class="report-panel"><div class="report-inner">
+      <div class="report-title">Your Journey's End</div>
+      <div class="report-subtitle" id="reportSubtitle"></div>
+      <div class="score-circle"><div class="score-pct" id="reportPct">0%</div><div class="score-pct-label">accuracy</div></div>
+      <div class="score-rank" id="reportRank"></div>
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-num" id="statCorrect">0</div><div class="stat-label">Correct Choices</div></div>
+        <div class="stat-box"><div class="stat-num" id="statWrong">0</div><div class="stat-label">Different Paths</div></div>
+        <div class="stat-box"><div class="stat-num" id="statSkipped">0</div><div class="stat-label">Narration Scenes</div></div>
+        <div class="stat-box"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total Scenes</div></div>
+      </div>
+      <div class="review-title">Scene-by-Scene Review</div>
+      <div id="reviewList"></div>
+      <div class="report-actions"><button class="btn btn-gold" onclick="confirmRestart()">↺ Play Again</button></div>
+    </div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const scenes = [{"chapter":"1","chName":"第一章：草根岁月 · 从平凡中走来","situation":"2003年夏，黑龙江齐齐哈尔。你叫张雪峰，刚满19岁。你家住在一片老式居民楼里，父亲是工厂工人，母亲在菜市场卖菜。高考成绩出来了——你考了472分，离一本线差12分。晚饭时，母亲叹了口气：“要不…去读个大专算了，早点出来工作。”父亲沉默地抽着烟。你知道家里供你读书不容易，但你也知道，如果就这样认命，你可能一辈子都走不出这个小城。你该怎么办？","options":["你点点头，对母亲说：“妈，我认了，读个大专也挺好。”","你放下筷子，认真地说：“妈，我想再考一年。”","你沉默不语，把碗里的饭扒拉完，回房间关上房门。"],"explains":["选择A意味着你接受了现状，放弃冲击更好大学的机会。但以你的性格，你内心不甘平庸，这个选择会让你在未来无数次后悔。","选择B意味着你选择了一条更艰难的路——复读。你清楚家里经济压力大，但你更清楚，只有考上更好的大学，才有机会真正改变命运。你的决心让父母沉默片刻，最终父亲掐灭烟头：“行，爸再供你一年。”","选择C意味着你选择逃避当下的决定，把问题拖延下去。但时间不等人，复读班的报名明天就截止了，犹豫会让你错过最佳时机。"],"points":[0,1,0],"hasChoice":true},{"chapter":"1","chName":"第一章：草根岁月 · 从平凡中走来","situation":"2004年夏，复读一年后，你考上了郑州大学，虽然专业是被调剂的——给排水科学与工程。大学校园对你来说是全新的世界，你第一次见到这么多来自天南海北的同学。开学第一周，辅导员让大家自我介绍，很多人说自己的目标是考研、考公、进大公司。轮到你时，全班安静下来，都在等这个“东北来的复读生”开口。你站上讲台，看着下面几十双眼睛，突然意识到——这是一个让别人记住你的机会。你准备怎么介绍自己？","options":["你规规矩矩地说：“大家好，我叫张雪峰，来自黑龙江，希望和大家一起好好学习。”","你清了清嗓子，用东北腔大声说：“大家好！我是张雪峰，齐齐哈尔来的。我这人没啥特长，就是话多、爱交朋友。以后谁想找人唠嗑，随时找我！”然后你还顺手模仿了一下赵本山的小品片段，全班笑成一片。","你紧张得手心冒汗，简单说了句“我叫张雪峰”就匆匆走下讲台。"],"explains":["选择A会让你顺利融入班级，但不会给人留下深刻印象。你天生的表现欲和幽默感会让你觉得这样太憋屈。","选择B会让你在开学第一天就成为全班的焦点。虽然有点“社死”，但大家记住了你这个有趣的东北人。这种敢于展示自己的性格，会为你日后在讲台上发光埋下种子。","选择C让你避免了出丑的风险，但也让大家对你没有任何印象。大学四年，你可能会一直活在自己的舒适区里。"],"points":[0,1,0],"hasChoice":true},{"chapter":"1","chName":"第一章：草根岁月 · 从平凡中走来","situation":"大二那年，你发现自己在给排水专业上越学越吃力，高数和流体力学让你头疼。但你意外地发现自己很喜欢参加学校的辩论赛和主持活动——每次站在台上，你都能滔滔不绝，而且同学们爱听你说话。一次校园主持人大赛，你拿了第一名，赛后一个学长拍着你的肩膀说：“雪峰，你这口才，不去干培训行业可惜了。”你第一次听说“培训行业”这个词。与此同时，你的专业课成绩在班里排倒数。期末考试结束后，你开始认真思考一个问题：大学剩下的两年，你是该拼命补专业课，还是把更多时间花在你擅长和喜欢的事情上？","options":["你决定把主要精力放在专业课学习上，每天泡图书馆，争取把绩点拉上来。","你决定“战略放弃”专业课，把课余时间用来参加演讲社团、接校园主持活动，并开始自学一些营销和沟通类的书籍。","你决定两头兼顾，既努力补专业课，又不放弃社团活动，把自己累得每天只睡五小时。"],"explains":["选择A看似稳妥，但你内心清楚，你对工科并没有真正的热情，即使把绩点拉上来，你未来也不会从事相关行业。这会让你在大学后期非常痛苦。","选择B是一次“叛逆”但忠于内心的选择。你意识到自己的优势不在于画图纸，而在于影响人、说服人。这个选择会让你失去拿奖学金的机会，但会让你提前找到自己真正擅长的赛道。","选择C看上去最“平衡”，但实际上两头都做不好。你的精力有限，这样硬撑会让你身心俱疲，而且专业课和社团活动都只能做到及格线。"],"points":[0,1,0],"hasChoice":true},{"chapter":"1","chName":"第一章：草根岁月 · 从平凡中走来","situation":"2007年春天，大四即将毕业。同学们都在忙着投简历、跑招聘会。你的专业课成绩依然平平，但你那套“不务正业”的经历让你在校内小有名气。一天，一个学长找到你，说北京一家考研培训机构正在郑州招人，需要能跑高校、发传单、做咨询的“市场专员”，底薪800加提成。学长犹豫地说：“工资不高，挺苦的，但我觉得你合适。”你看着手里的招聘传单，又想到家里还在等你寄钱回去。你面前摆着两条路。","options":["你决定先去参加几场“正经”的国企招聘会，给排水专业虽然你不喜欢，但好歹是份稳定工作。","你决定接下这个考研机构的offer，去北京闯一闯，哪怕只是从发传单开始。","你决定先不着急工作，再等等看有没有更好的机会，反正离毕业还有几个月。"],"explains":["选择A会让你得到一份月薪2000左右的国企技术员工作，安稳但乏味。你会在这个岗位上干几年，然后慢慢变成一个“一事无成的中年人”——你后来回忆说，这是你最接近“平庸”的时刻。","选择B意味着你选择了一条收入更低、风险更高的路。但你会接触到考研行业，开始研究院校数据，你那天赋般的口才和感染力也终于找到了用武之地。这是你人生的第一个关键转折。","选择C让你错过了这两个机会。几个月后，你既没有国企的offer，考研机构的岗位也招满了，你只能随便找了一份和专业无关的工作，浪费了宝贵的时间。"],"points":[0,1,0],"hasChoice":true},{"chapter":"1","chName":"第一章：草根岁月 · 从平凡中走来","situation":"2007年秋，你刚到北京，住在一间月租300的地下室里，每天骑着破自行车跑遍北京各大高校发传单。你的工作是在校园里摆摊，给路过的学生介绍考研课程。前三个月，你业绩垫底，主管说要“再观察一个月”。一天傍晚，你在北京理工大学门口摆摊，一个戴着眼镜的女生犹豫地走过来问：“老师，我想考本校的研究生，但不知道怎么选专业。”你之前被要求背了一堆话术，但这一刻你突然意识到——那些话术太套路了，你不想这么说。你看着她的眼睛，决定……","options":["你按照公司培训的话术，流利地背了一遍：“同学你好，我们机构有专业的院校分析团队……”","你合上话术本，对她说：“同学，你本科什么专业？你喜欢这个专业吗？如果你只是想要个文凭，我推荐你考这个学院；如果你真想学东西，我建议你考虑另一个方向。”然后你用自己的理解给她分析了两个选择的利弊。","你实话实说：“其实我也不太懂，我也是刚入行，要不你留个电话我回去问问主管？”"],"explains":["选择A会让你完成任务，但那个女生听完大概率不会报名。你也会继续在“话术复读机”的角色里徘徊，无法脱颖而出。","选择B是冒险——你违反了公司规定，没有使用标准话术。但女生听完后很惊讶：“你怎么比我们辅导员还懂？”她后来不仅自己报了名，还拉来了三个同学。你第一次意识到，真诚和专业比话术更重要。这件事让你找到了自己的核心优势。","选择C虽然诚实，但暴露了你的不专业。女生失望地离开了，你失去了一个潜在客户，也失去了建立自信的机会。"],"points":[0,1,0],"hasChoice":true},{"chapter":"1","chName":"第一章：草根岁月 · 从平凡中走来","situation":"2008年，你已经在北京的考研机构干了一年多，从发传单做到了可以上台讲小班课。但你逐渐发现，这家机构的课程设置很死板，老师们都在照本宣科，学生上课昏昏欲睡。你试过在课堂上加点段子活跃气氛，主管把你叫到办公室：“张雪峰，我们是严肃的培训机构，不要搞这些乱七八糟的。”你拿着刚发的1800元工资条，开始认真思考：是继续留在这家机构“稳定”地混着，还是……","options":["你决定听从主管的意见，收敛自己的风格，按部就班地讲课，先保住这份工作再说。","你决定辞职。你打算找一家更灵活、允许你发挥个人风格的新机构，哪怕从头再来。","你决定表面上答应主管，私下里继续在课堂上偷偷加段子，试图“两边都不得罪”。"],"explains":["选择A会让你短期内保住饭碗，但你会越来越压抑。你的讲课风格会被彻底磨平，变成一个平庸的讲师，很快就会被行业淘汰。","选择B意味着你放弃了稳定，选择了一条更冒险但更符合你本性的路。你后来加入了一家刚起步的、愿意让你“折腾”的机构——在那里，你开始真正打磨出后来火遍全网的“相声式讲课”风格。","选择C看上去很聪明，但风险极高。一旦被主管发现，你会被直接开除，而且在这个行业里留下“不守规矩”的名声，得不偿失。"],"points":[0,1,0],"hasChoice":true},{"chapter":"2","chName":"第二章：破茧成蝶 · 从讲师到“网红”","situation":"2016年春天，你已经在考研辅导行业摸爬滚打了近十年。你讲课的风格越来越独特——语速快、段子多、表情夸张，学生们管你叫“考研界郭德纲”。但你只是在一个中等规模的机构里，名气局限在东北和河南的几个城市。一个普通的周三下午，你照常在郑州大学附近的一个小教室里给学生做考研规划讲座。那天你状态很好，讲到34所自主划线院校时，你即兴发挥了一段，语速飞快，把各个学校的特点用段子串了起来。台下有个学生偷偷用手机录了这段视频。下课后，学生跑过来问你：“张老师，我能把这段发到网上吗？”你当时并不在意，随口说了句“行啊”。你完全不知道，这段7分钟的视频，即将彻底改变你的人生。","options":["你同意了，但没当回事，继续按部就班地准备下一场讲座。","你突然警觉起来，让学生把视频删掉，说“还没准备好面对那么多人”。","你让学生把视频发给你先看一下，你觉得合适再让他上传。"],"explains":["选择A让视频顺利上传网络，当晚就获得了数百万播放量。这是你人生最重要的转折点之一，你从一个小众讲师一夜之间成为全网关注的焦点。","选择B会让你暂时保持“安全”，但你会错失那个改变命运的节点。这个视频本可以让你提前几年被大众认识。","选择C看似谨慎，但那个学生后来把视频发给你的过程中出了差错，视频最终没有上传成功。你错过了一次重要的曝光机会。"],"points":[1,0,0],"hasChoice":true},{"chapter":"2","chName":"第二章：破茧成蝶 · 从讲师到“网红”","situation":"2016年夏，那段“7分钟解读34所985”的视频在全网播放量破亿。你走在路上会被认出来，微博粉丝从几千涨到百万。各种邀约蜂拥而至：电视台请你去录节目，企业请你去做演讲，还有几家机构开出千万年薪想挖你。你站在北京国贸的一间写字楼里，面前摆着三份合同：一份是某上市教育集团的“首席讲师”合约，年薪1200万，但要求你以后只能按他们的标准化课件讲课；一份是某直播平台的主播合约，保底800万，但要求你每周直播四天，每天至少三小时，内容以娱乐化为主；还有一份……是你自己写的计划书——你想成立自己的工作室，自己决定讲什么、怎么讲，但启动资金只有这些年攒下的200万。你选择……","options":["你选择签约上市教育集团，拿1200万年薪，做一个“高薪的打工人”。","你选择签约直播平台，利用现在的热度快速变现，做一名“知识主播”。","你选择第三条路——拿出自己的积蓄，成立个人工作室，自己掌握内容创作的主动权。"],"explains":["选择A意味着你会获得巨大的物质回报，但你会失去对内容的掌控权。标准化课件会让你的风格逐渐被抹平，你不再是那个“自由的张雪峰”。","选择B会让你在短期内赚到快钱，但直播平台对流量的极致追求会让你被迫越来越娱乐化、越来越极端，最终口碑反噬。","选择C是最冒险的——你拒绝了所有巨额邀约，选择自己干。这会让你在接下来几年里压力巨大，但你会保持对自己内容的主导权，为你日后创办“峰学蔚来”打下基础。这个选择最符合你的性格——你不愿意被任何人框住。"],"points":[0,0,1],"hasChoice":true},{"chapter":"2","chName":"第二章：破茧成蝶 · 从讲师到“网红”","situation":"2017年，你受邀参加综艺节目《演说家》。录制现场灯光刺眼，台下坐着几百名观众和几位嘉宾。你的演讲主题是“考研能否改变命运”。你准备了大量数据，想论证“对于普通家庭的孩子来说，考上名校是实现阶层跃迁最可行的路径”。演讲结束后，一位嘉宾站起来反驳你：“张老师，你太功利了。人生的价值不是用学历来衡量的，很多没有上过名校的人一样很成功。”现场掌声雷动，摄像机对准了你。你知道，这段对话播出后，会被剪辑、传播、反复讨论。你会被贴上“功利主义者”“学历决定论者”的标签，也可能被无数普通家庭的孩子视为“说出了大实话的人”。你如何回应？","options":["你选择用更激烈的言辞反驳：“你说的那些‘没上过名校的成功人士’，你知道他们背后有多少资源吗？你拿个例来否定统计学规律，这是不负责任的！”","你停顿了几秒，然后平静地说：“你说得对，人生的价值确实不只靠学历。但我想请问，现场有多少观众来自农村、来自县城？你们告诉我，如果不走高考这条路，你们现在会在哪里？我说的不是理想，我说的是现实。”","你尴尬地笑了笑，说：“这个问题太复杂了，我们下来再聊吧。”然后迅速转移话题。"],"explains":["选择A会让你在节目现场赢得气势，但播出后会被剪辑成“张雪峰激烈怒怼嘉宾”的片段，争议会更大，你会被彻底标签化。","选择B让你失去了当场“赢”的快感，但你的这段话让现场沉默了很久。播出后，这个片段引发了更广泛的讨论——有人支持你，有人批评你，但至少，人们开始思考你说的“现实”是什么。这个回应更符合你后来逐渐沉淀下来的形象：犀利但清醒。","选择C让你避开了当场冲突，但也让你失去了表达自己观点的机会。观众会觉得你“理亏”“不敢接招”，对你的专业形象是很大的损害。"],"points":[0,1,0],"hasChoice":true},{"chapter":"2","chName":"第二章：破茧成蝶 · 从讲师到“网红”","situation":"2018年，你的名气达到了顶峰，但也陷入了舆论的漩涡。有人开始逐字逐句地扒你之前的讲课视频，发现你在介绍某些学校时存在数据错误，比如把某所211的录取比例说错了；还有人指责你“地域黑”，说你在调侃某些省份的考生时“过分了”。微博上，“张雪峰道歉”的话题冲上热搜第一。你的团队慌了，建议你发一份“标准公关稿”，把锅甩给“口误”和“节目效果”。你坐在办公室里，看着屏幕上不断攀升的恶评，你知道这一次不是靠幽默能糊弄过去的。你选择……","options":["你接受团队的建议，发一份官方声明：“因本人备课不严谨，部分数据有误，在此向相关院校及同学致歉。”但把调侃的内容说成是“幽默表达，请勿过度解读”。","你发了一条长微博，没有用公关稿，而是自己写的：“数据错了是我的问题，我认，以后会更加严谨。关于调侃，我本意不是地域黑，但如果有人觉得被冒犯了，我道歉。但我不会因此改变讲课风格，因为我的学生需要的是能听进去的课，不是一本正经的教材。”","你选择沉默，不回应任何争议，觉得“过几天大家就忘了”。"],"explains":["选择A会让你安全度过这次危机，但很多人会觉得你在“打太极”，反而加深了“张雪峰不严谨、爱甩锅”的印象。","选择B是一次冒险——你承认了错误，但也明确表达了“我不会改风格”的态度。这让一部分人更讨厌你，但也让很多学生觉得你“真实”。你后来回忆，这条微博让你流失了一些路人缘，但核心粉丝更铁了。你选择直面问题，而不是逃避。","选择C是最糟糕的应对方式。沉默只会让舆论发酵，质疑声会越来越大，你的口碑会受到长期损害。"],"points":[0,1,0],"hasChoice":true},{"chapter":"2","chName":"第二章：破茧成蝶 · 从讲师到“网红”","situation":"2019年，你已经是一个“争议人物”了。喜欢你的人觉得你是“唯一说真话的老师”，讨厌你的人觉得你是“贩卖焦虑的投机者”。这一年，你开始频繁失眠。有天深夜，你刷到一条私信，是一个河南农村的男生发的：“张老师，我听了你的课，考上了西南大学。我爸在工地上摔断了腿，本来想让我辍学，但我拿着录取通知书给他看，他哭了。谢谢你。”你盯着屏幕看了很久。你突然意识到，外面那些骂你的人也好、捧你的人也好，其实都离你很遥远。真正让你走到今天的，是那些在深夜里听你讲课、想靠一场考试改变命运的孩子。你想为他们做得更多。第二天早上，你做了一个决定。","options":["你决定继续沿着老路走——接更多的商业演讲、上更多的综艺、把个人IP变现最大化。毕竟，热度不等人。","你决定收缩商业活动，把更多精力投入到“高考志愿填报指导”这个新领域。你发现，相比于考研，高考志愿填报是更多普通家庭孩子面临的第一个、也是最关键的选择。你希望能帮他们在这一步就少走弯路。","你决定减少工作量，多休息、多陪家人，先把自己的身体和心理状态调整好再说。"],"explains":["选择A会让你在接下来两三年里赚到更多的钱，但你会越来越疲惫，越来越像一个“流量明星”而不是老师。你内心的空虚感会越来越强。","选择B意味着你主动“降温”——减少曝光、推掉综艺、花大量时间重新整理全国高校的录取数据。这会让你短期内收入下降、热度降低，但你会找到一个新的、更扎实的方向：高考志愿填报。这个选择为你后来创办“峰学蔚来”埋下了最重要的伏笔。","选择C看上去很“养生”，但你的性格决定了你闲不下来。强行减少工作会让你焦虑，而且那些需要你的孩子也会失去一个重要的指路人。"],"points":[0,1,0],"hasChoice":true},{"chapter":"3","chName":"第三章：商海沉浮与自我重塑 · 从个体IP到企业家","situation":"2021年，你已经从考研辅导成功拓展到高考志愿填报领域，积累了庞大的粉丝基础。但你也越来越清楚地意识到一个问题：你是一个人在战斗。所有课程内容、所有公开回应、所有商业决策都压在你一个人身上。你每天工作16个小时，微信消息永远回不完。你知道，如果哪天你倒下了，这一切都会消失。你开始认真思考：是继续做那个“永远在线”的张老师，还是……","options":["你决定保持现状，继续以个人IP为核心运营。你觉得一旦成立团队、搞公司，就会变得“不纯粹”，会失去和学生的直接连接。","你决定在苏州成立一家公司——“峰学蔚来”。你打算把个人经验系统化，招募团队，把课程研发、咨询服务、内容输出都变成可持续的产品。这意味着你要从“老师”变成“老板”。","你决定找一个合伙人，把自己50%的股份分出去，让对方负责管理，你只负责讲课。"],"explains":["选择A会让你继续享受“一个人说了算”的自由，但你的身体和精力已经快到极限了。没有团队支撑，任何一个意外都可能让你的事业崩塌。","选择B意味着你进入一个全新的、你不熟悉的领域——管理。你可能会踩很多坑，可能会因为不懂管理而交“学费”，但这是让你的影响力持续下去的唯一路径。你选择了从“个体户”变成“企业家”。","选择C看上去是一个折中方案，但找到一个既懂教育又懂管理、还和你合拍的合伙人非常困难。这个过程会浪费你大量时间，而且股权分配也可能引发后续矛盾。"],"points":[0,1,0],"hasChoice":true},{"chapter":"3","chName":"第三章：商海沉浮与自我重塑 · 从个体IP到企业家","situation":"2022年，“峰学蔚来”成立一年了。你发现当老板比当老师难多了：员工要发工资，产品要迭代，客户要服务，还要应对各种突如其来的舆情。最让你头疼的是团队管理——你招来的几个年轻讲师很有才华，但总想模仿你的风格，结果学不像，还被学生吐槽“东施效颦”。你开会时发了火：“能不能有点自己的东西？”会后，一个你亲自带的徒弟找到你，委屈地说：“张老师，我是因为喜欢你的风格才来的，但每次我想尝试点新东西，你就觉得不对。你到底想要什么？”你愣住了。你意识到，你可能在无意识中要求所有人都成为“第二个张雪峰”。那天晚上，你想了很久。你决定……","options":["你决定坚持自己的标准：公司出品的内容必须有“张雪峰风格”，不符合的一律重做。你觉得这是保证品牌质量的方式。","你决定放下“师父”的架子，找那个徒弟深谈一次。你告诉他：“我之前错了。你不要学我，你要找到你自己的风格。我给你平台，你去做你真正想做的内容。做砸了我兜底，做成了是你自己的。”","你决定不再亲自带新人，把培训工作交给职业经理人，自己只负责直播和讲课。"],"explains":["选择A会让你的公司在短期内保持“统一风格”，但会扼杀团队成员的创造力。优秀的人会陆续离开，公司会变成一个“张雪峰复制工厂”。","选择B是一次痛苦的自我调整——你承认自己作为管理者还不够成熟。但你给了年轻人空间，后来那个徒弟做出了一个很受欢迎的系列课程，风格和你完全不同，但同样成功。你学会了从“明星”变成“平台”。","选择C让你逃避了管理的难题，但职业经理人无法理解教育行业的特殊性，新人的培养质量反而下降，公司的内容创新能力越来越弱。"],"points":[0,1,0],"hasChoice":true},{"chapter":"3","chName":"第三章：商海沉浮与自我重塑 · 从个体IP到企业家","situation":"2023年底，一场更大的舆论风暴袭来。你在一次直播中说了一句“文科都是服务业”，瞬间被截取传播，引爆全网。话题#张雪峰文科都是服务业#冲上热搜第一，阅读量破十亿。批评者说你“侮辱文科生”“价值观扭曲”“把教育变成生意”。支持者说你“说了大实话”“文科生就业确实难”。你的团队紧急开会，建议你立刻道歉、删除直播回放、暂时停播避风头。你看着手机里铺天盖地的消息，你知道这和你之前遇到的所有争议都不一样——这次直接触动了千万文科生和文科从业者的神经。你选择……","options":["你按照团队的建议，发布道歉声明，删除争议内容，暂时停播“避风头”。","你没有发正式道歉声明，而是在第二天照常开播。直播中，你平静地说：“昨天的‘服务业’说法引起了很大争议。我解释一下：我说的‘服务业’是指工作本质上都是在服务他人，包括我自己也是在服务学生和家长。如果我的表达让大家觉得我在贬低文科，那是我表述不当。但我坚持我的核心观点：在目前的就业环境下，文科生确实需要更务实的职业规划。”然后你继续讲志愿填报，没有再多做纠缠。","你发了一条长微博，承认自己“说错了话”，向所有文科生道歉，并宣布以后不再讨论文科相关的话题。"],"explains":["选择A会让你暂时平息舆论，但很多人会觉得你“认怂了”“被流量反噬”。这次退缩会让你在接下来一段时间里变得小心翼翼，失去以往那种“敢说”的锐气。","选择B是一次风险极高的操作——你没有回避，而是用更理性的方式重新阐述了自己的观点，同时没有停下工作。这会让一部分反对者更愤怒，但也让很多人重新审视你的原话到底在说什么。你后来回忆，这是你“从网红向行业专家过渡”的一次关键表态。","选择C看上去是最彻底的“认错”，但你主动放弃了在文科就业问题上的话语权。以后你再想讨论相关话题时，会被人反复拿这条微博来打脸，你的公信力会大打折扣。"],"points":[0,1,0],"hasChoice":true},{"chapter":"3","chName":"第三章：商海沉浮与自我重塑 · 从个体IP到企业家","situation":"2024年，“峰学蔚来”已经走上正轨，团队超过百人，业务涵盖高考志愿填报、考研规划、研学营、图书出版等多个领域。你从那个在地下室发传单的年轻人，变成了身家过亿的企业家。但你也发现，自己越来越忙，离学生越来越远。以前你能在课后和学生聊半小时，现在你的日程被会议、商务洽谈、直播排满。有一天，一个从外地坐了12小时硬座来找你咨询的高中生，在公司楼下等了四个小时，最后只和你合了一张影，就被助理“请”走了。你回到办公室，看到那个孩子在你微博下的留言：“张老师，我就是想当面谢谢你。三年前听了你的课，我从县城考上了市里的重点高中。明年我要高考了，希望你能再给我讲一次话。”你放下手机，沉默了很久。你意识到，如果再这样下去，你会变成一个“成功的商人”，但再也不是那个“张老师”了。你决定……","options":["你决定维持现状。公司已经做大了，你是CEO，不可能再像以前那样“一对一”服务每个学生。你把更多精力放在公司管理和新业务拓展上。","你决定每周至少留出半天时间，不安排任何商务活动，专门用来免费接听学生的咨询电话。你知道这“效率很低”，但你觉得这是提醒自己“从哪里来”的方式。你还在公司内部设立了一个“学生直通车”通道，确保每一个想联系你的学生都能在48小时内得到回复。","你决定把公司交给合伙人管理，自己重新回归一线，全职做讲课和咨询，收入减少也在所不惜。"],"explains":["选择A会让你成为一个更“高效”的企业家。公司会继续扩张，你的财富会继续增长。但你心里那个“张老师”会慢慢死去。很多年后，你会发现自己再也讲不出当年那些让学生眼睛发亮的话了。","选择B意味着你主动“降效”——你牺牲了一部分商业利益，换取和学生的连接。这不会写在任何财报上，但会让你在忙碌的商人生活中，依然能触摸到自己最初的热情。你选择了做一个“有钱但没忘本的张雪峰”。","选择C让你彻底回归了初心，但公司失去核心IP后，业务会迅速萎缩，团队可能面临裁员甚至解散。你的理想主义可能会伤害那些跟着你一起打拼的员工。"],"points":[0,1,0],"hasChoice":true},{"chapter":"4","chName":"终章：燃尽的生命 · 猝然落幕","situation":"2023年6月的一个深夜，苏州。你刚刚结束一场长达四小时的直播，从椅子上站起来的一瞬间，胸口像被一块巨石压住，闷得喘不过气。助理发现你脸色苍白、额头冒汗，立刻叫了救护车。急诊室里，医生看着你的检查报告，皱着眉说：“张老师，你这心脏已经有问题了。心肌缺血，加上长期熬夜、压力大。你必须住院，至少休养两周。”你躺在病床上，手机还在不停震动——明天的直播、后天的会议、下周的讲座……你心里清楚，这个节骨眼上，公司刚刚推出新的课程产品，团队上百号人等着你带队冲业绩。但医生的话也像一记警钟敲在心上。你选择……","options":["你对医生说：“医生，我实在走不开，给我开点药，我回去注意休息就行。”当天晚上你就办了出院，第二天照常出现在直播间。","你听从医生的建议，住进了医院。你在病床上用手机处理必要的工作，但把大部分事务交给了团队。你第一次连续十天没有直播。出院时，医生再三叮嘱：“以后不能再这么拼了，要规律作息，适量运动。”","你和医生讨价还价，只住三天院就强行出院，签了“后果自负”的保证书。"],"explains":["选择A让你保住了“全勤”的纪录，公司业务也没有因为你的缺席而中断。但你错过了身体发出的第一次、也是最强烈的警告。你告诉自己“等忙完这阵子就休息”，但这个“阵子”再也没有结束。","选择B让你在2023年夏天暂时停下了脚步。你被迫学会了“放手”，团队在你缺席的十天里依然运转。你开始认真对待医生的建议，重新规划作息，甚至在公司健身房摆了一台跑步机。这个选择为你争取了两年多的时间，但也仅仅是“争取”——因为你骨子里那个停不下来的张雪峰，终究还是没学会真正的休息。","选择C看上去是“折中”，但实际上是最危险的选择。三天的住院根本不够，你的身体没有得到充分恢复。出院后你马上投入高强度工作，隐患反而比选择A更大。"],"points":[0,1,0],"hasChoice":true},{"chapter":"4","chName":"终章：燃尽的生命 · 猝然落幕","situation":"2026年3月，距离那次住院已经过去将近三年。你确实比以前注意身体了——不再天天熬夜，每周会去跑几次步，中午也常在公司健身房的跑步机上锻炼。员工们看到你在跑步机上挥汗如雨的样子，都说“张老师现在讲究养生了”。但你心里清楚，你只是把“拼命”换了一种方式：跑步的时候，耳机里放的不是音乐，而是课程录音；跑步结束后，等待你的是排满的会议和直播。3月的苏州天气转暖，你明显感觉到公司今年的压力比往年更大——高考临近，志愿填报季的咨询量暴增，你的日程表从早上八点排到凌晨。3月24日这天中午，你像往常一样来到公司健身房，走上跑步机。你设定了5公里的目标，戴上耳机，按下启动键。你选择……","options":["你按照习惯，把跑步速度设定在每小时10公里，打算用30分钟跑完5公里，然后洗个澡去开下午两点的会。","你把速度调低到每小时7公里，打算慢跑30分钟，同时把耳机里的课程录音换成舒缓的音乐。你告诉自己：“今天状态一般，悠着点。”","你把速度调到每小时12公里，打算用更短的时间跑完，省出时间多准备一下下午的会议资料。"],"explains":["选择A是你过去三年里做了无数次的选择——用最高效的方式完成锻炼，然后立刻投入工作。你的身体在日复一日的“高效”中早已透支，只是你自己没有察觉。这个中午，当你的心率在跑步机上飙升到危险阈值时，你的心脏再也承受不住了。","选择B是你极少做出的选择——对自己“手下留情”。慢跑、听音乐、给自己一个真正放松的半小时。这个选择会让你错过下午两点的会，但会让你活下来。在故事的这个节点，你需要选择“慢下来”。","选择C是你最不应该做的选择——你已经透支了身体，还要用更高强度来压榨自己。这会让悲剧发生得更快、更突然。"],"points":[0,1,0],"hasChoice":true},{"chapter":"4","chName":"终章：燃尽的生命 · 猝然落幕","situation":"2026年3月24日，中午12点26分。你在公司健身房的跑步机上突然感到一阵剧烈的胸闷，和2023年那次完全不同——这次像有人在你胸口猛击一拳，剧痛从胸口蔓延到左臂和下巴。你本能地按下跑步机的急停键，踉跄着走下机器，扶住墙壁。几秒钟后，你的视线开始模糊，双腿发软，整个人沿着墙壁滑坐在地上。健身房的灯光明晃晃地刺眼，你听到远处似乎有人在喊“张老师”，但声音越来越远。你的手机就掉在旁边地板上，屏幕亮着，是一条未读消息——来自那个河南农村的男生：“张老师，我研究生毕业了，考上老家县城的公务员了。谢谢你。”你已经看不清屏幕上的字了。在意识消散前的最后几秒，你想起了一个画面：2004年，郑州大学的教室里，一个东北口音的大一新生站在讲台上，对着全班同学说——“大家好，我是张雪峰。”此刻，你……","options":["你已经没有力气做出任何反应了。","你用尽最后一丝力气，想伸手去够掉在地上的手机，想给妻子发一条消息，想给公司的合伙人打一个电话，想再看一眼那个考上公务员的男生的留言。但你的手只抬起了一点点，就无力地垂下了。","你努力张开嘴，想喊出“救命”，但喉咙里只发出一丝微弱的气音。"],"explains":["这是故事的终点。在人生的最后一个节点，你没有任何选择——或者说，所有选项都通向同一个结局。你的生命停在了41岁，停在了你为之奋斗了大半生的那条路上。","这是一个没有“正确选择”的节点。游戏设计在这里不再让玩家“赢得分数”，而是让玩家面对一个沉重的事实：有些东西，失去了就是失去了。张雪峰的一生，像一支燃到尽头的蜡烛——他照亮了无数人前行的路，也燃尽了自己。","无论你做出什么反应，结局都不会改变。你已经走完了张雪峰的人生。"],"points":[0,0,0],"hasChoice":true},{"chapter":"4","chName":"终章：燃尽的生命 · 猝然落幕","situation":"2026年3月24日15时50分，苏州大学附属第二医院。抢救室的灯熄灭了。医生走出来，对着走廊里等待的家人和同事，轻轻摇了摇头。消息传开的那一刻，整个教育圈、无数你曾经帮助过的学生，都被这个消息震住了。你生前最后一条朋友圈定格在前一天晚上，是你拍的公司健身房跑步机的照片，配文是：“今天又跑了五公里，状态不错，明天继续。”后来有人统计，你从事教育行业近二十年，直接或间接帮助过的学生超过千万。你的追悼会那天，苏州下着雨，但殡仪馆门口排起了长队——有从全国各地赶来的学生，有你曾经的同事，有你帮助过的家长。人群中，那个河南农村的男生举着一块牌子，上面写着：“张老师，我考上了。”游戏至此，玩家已经走完了张雪峰的一生。根据你在各个关键节点的选择，你将迎来不同的结局。","options":["你的一生，是一场没有停歇的奔跑。你从一个东北小城的普通少年，活成了千万学子心中的“张老师”。你犀利、幽默、清醒，也固执、偏激、停不下来。你改变了很多人的命运，却没能改变自己的结局。","你的一生，是一场遗憾与光芒交织的旅程。你曾在关键时刻选择了“慢下来”，你学会了放手、学会了拒绝、学会了把健康放在工作前面。但你骨子里那股东北人的倔强，终究让你在一次普通的午间锻炼中，倒在了自己最熟悉的地方。","你的一生，是一场不断错过又不断弥补的修行。你做过错误的选择，走过弯路，留下过遗憾。但最终，你还是帮助了足够多的人，让他们记住了“张雪峰”这个名字。"],"explains":["这是游戏的终章回顾页面。无论玩家在前面的节点做出了怎样的选择，最终的结局都指向同一个事实：张雪峰的生命停在了41岁。但不同选择会影响“追悼会”上的细节——那些曾经被你帮助过的人，那些因为你而改变命运的故事，会以不同的方式出现在这个结局里。玩家获得的“分数”决定了结局的侧重点：高分意味着你（作为张雪峰）在生前帮助了更多人、做了更多正确的决定；低分意味着你走了更多弯路、留下了更多遗憾。但无论如何，那个站在郑州大学讲台上的东北少年，已经完成了他的使命。","",""],"points":[0,0,0],"hasChoice":true}];
+let answers = new Array(scenes.length).fill(null);
+let currentIndex = 0;
+let totalScore = 0;
+const SAVE_KEY = 'biographyQuestSave';
+
+function initGame(savedState) {
+  answers = new Array(scenes.length).fill(null);
+  totalScore = 0; currentIndex = 0;
+  if (savedState) { answers = savedState.answers || answers; currentIndex = savedState.currentIndex || 0; totalScore = savedState.totalScore || 0; }
+  showScreen('gameScreen');
+  renderScene(currentIndex);
+}
+
+function renderScene(idx) {
+  const s = scenes[idx];
+  document.getElementById('chapterLabel').textContent = 'Chapter ' + s.chapter;
+  document.getElementById('chapterName').textContent = s.chName;
+  const pct = Math.round(((idx+1)/scenes.length)*100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('pageIndicator').textContent = 'Scene ' + (idx+1) + ' of ' + scenes.length;
+  document.getElementById('scoreDisplay').textContent = totalScore;
+  document.getElementById('situationText').textContent = s.situation;
+  const cs = document.getElementById('choicesSection');
+  const pm = document.getElementById('proceedMsg');
+  if (s.hasChoice) {
+    cs.style.display='block'; pm.style.display='none';
+    ['choiceAText','choiceBText','choiceCText'].forEach((id,i)=>document.getElementById(id).textContent=s.options[i]);
+    ['choiceA','choiceB','choiceC'].forEach(id=>{const b=document.getElementById(id);b.className='choice-btn';b.disabled=false;});
+    ['iconA','iconB','iconC'].forEach(id=>document.getElementById(id).textContent='');
+  } else { cs.style.display='none'; pm.style.display='block'; }
+  document.getElementById('explanationCard').classList.remove('show');
+  const ans = answers[idx];
+  if (ans !== null && ans !== -1 && s.hasChoice) showChoiceResult(ans, false);
+  document.getElementById('prevBtn').disabled = idx === 0;
+  document.getElementById('nextBtn').textContent = idx === scenes.length-1 ? 'Finish ✦' : 'Next ▶';
+}
+
+function showChoiceResult(chosen, updateScore) {
+  const s = scenes[currentIndex];
+  ['choiceA','choiceB','choiceC'].forEach((id,i)=>{
+    const b=document.getElementById(id); b.disabled=true;
+    const ic=document.getElementById(['iconA','iconB','iconC'][i]);
+    if(i===chosen&&s.points[i]===1){b.classList.add('correct');ic.textContent='✓';}
+    else if(i===chosen&&s.points[i]!==1){b.classList.add('wrong');ic.textContent='✗';}
+    else if(i!==chosen&&s.points[i]===1){b.classList.add('correct-unselected');ic.textContent='✓';}
+  });
+  const isCorrect=s.points[chosen]===1;
+  document.getElementById('resultBadge').innerHTML=isCorrect?'<span class="correct-badge">✓ Correct — This matches history!</span>':'<span class="wrong-badge">✗ Not quite — The hero chose differently</span>';
+  document.getElementById('explanationText').textContent=s.explains[chosen];
+  document.getElementById('explanationCard').classList.add('show');
+  if(updateScore&&isCorrect){totalScore+=s.points[chosen];document.getElementById('scoreDisplay').textContent=totalScore;}
+}
+
+function makeChoice(chosen) {
+  if(answers[currentIndex]!==null)return;
+  answers[currentIndex]=chosen;
+  showChoiceResult(chosen,true);
+  autoSave();
+}
+
+function navigate(dir) {
+  const s=scenes[currentIndex];
+  if(dir===1){
+    if(answers[currentIndex]===null){if(s.hasChoice){showToast('Please make a choice before proceeding.');return;}else{answers[currentIndex]=-1;}}
+    if(currentIndex===scenes.length-1){showReport();return;}
+    currentIndex++;
+  } else { if(currentIndex===0)return; currentIndex--; }
+  renderScene(currentIndex); autoSave();
+}
+
+function saveProgress(){localStorage.setItem(SAVE_KEY,JSON.stringify({scenes,answers,currentIndex,totalScore,savedAt:Date.now()}));showToast('Progress saved! ✦');}
+function autoSave(){localStorage.setItem(SAVE_KEY,JSON.stringify({scenes,answers,currentIndex,totalScore,savedAt:Date.now()}));}
+function loadSave(){try{const r=localStorage.getItem(SAVE_KEY);return r?JSON.parse(r):null;}catch{return null;}}
+function confirmRestart(){if(confirm('Restart?')){localStorage.removeItem(SAVE_KEY);initGame();}}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+function showReport(){
+  showScreen('reportScreen');
+  let c=0,w=0,sk=0;
+  scenes.forEach((s,i)=>{if(!s.hasChoice){sk++;return;}const a=answers[i];if(a===null||a===-1){sk++;return;}if(s.points[a]===1)c++;else w++;});
+  const tot=c+w,pct=tot>0?Math.round((c/tot)*100):0;
+  document.getElementById('reportPct').textContent=pct+'%';
+  document.getElementById('statCorrect').textContent=c;
+  document.getElementById('statWrong').textContent=w;
+  document.getElementById('statSkipped').textContent=sk;
+  document.getElementById('statTotal').textContent=scenes.length;
+  const ranks=['A kindred spirit of the hero','Walking in the hero\'s shadow','A student of history','Still learning the legend','A path all your own'];
+  const ri=pct>=90?0:pct>=70?1:pct>=50?2:pct>=30?3:4;
+  document.getElementById('reportRank').textContent='"'+ranks[ri]+'"';
+  document.getElementById('reportSubtitle').textContent='You matched the hero\'s choices '+pct+'% of the time across '+tot+' decision'+(tot!==1?'s':'');
+  const list=document.getElementById('reviewList');list.innerHTML='';
+  scenes.forEach((s,i)=>{if(!s.hasChoice)return;const a=answers[i];if(a===null||a===-1)return;const ok=s.points[a]===1;const el=document.createElement('div');el.className='review-item';el.innerHTML='<div class="review-icon">'+(ok?'✓':'✗')+'</div><div class="review-q"><strong>Scene '+(i+1)+' · Ch.'+s.chapter+': '+s.chName+'</strong><div class="chose">You chose: '+['A','B','C'][a]+'. '+s.options[a]+'</div><div style="font-size:0.88rem;color:#5a4020;margin-top:4px;">'+s.explains[a]+'</div></div>';list.appendChild(el);});
+  localStorage.removeItem(SAVE_KEY);
+}
+
+// Start
+const saved = loadSave();
+if (saved && saved.scenes && confirm('Resume your saved game?')) {
+  scenes.length = 0; saved.scenes.forEach(s=>scenes.push(s));
+  initGame(saved);
+} else { initGame(); }
+</script>
+</body>
+</html>
