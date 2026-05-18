@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+<title>北平无战事</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Ma+Shan+Zheng&display=swap');
+
+  :root {
+    --ink: #1a1008;
+    --paper: #f5ede0;
+    --aged: #d4b896;
+    --red: #c0392b;
+    --gold: #b8860b;
+    --shadow: rgba(0,0,0,0.4);
+    --correct-bg: #1a3a1a;
+    --correct-text: #9bdf9b;
+    --wrong-bg: #3a1a1a;
+    --wrong-text: #f09a9a;
+    --neutral-bg: #1a2a3a;
+    --neutral-text: #9ac2e6;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0e0b07;
+    background-image:
+      radial-gradient(ellipse at 50% 0%, #2a1a08 0%, transparent 70%),
+      url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px 80px;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 18px;
+  }
+
+  #game {
+    width: 100%;
+    max-width: 720px;
+    position: relative;
+  }
+
+  .scene-img {
+    width: 100%;
+    height: auto;
+    border-radius: 3px;
+    margin-bottom: 18px;
+    border: 1px solid #3a2a18;
+    display: block;
+    opacity: 0.85;
+    transition: opacity 0.4s ease;
+  }
+  .scene-img:hover { opacity: 1; }
+
+  .title-block {
+    text-align: center;
+    margin-bottom: 32px;
+    padding-top: 20px;
+    animation: fadeDown 0.8s ease both;
+    position: relative;
+  }
+  .title-block .title-img-wrap {
+    position: relative;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .title-block .title-img-wrap::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 60%;
+    background: linear-gradient(transparent, #0e0b07);
+    pointer-events: none;
+  }
+  .title-block .title-img-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+    opacity: 0.7;
+  }
+  .title-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    text-align: center;
+    width: 90%;
+  }
+  .title-overlay h1 {
+    font-family: 'Ma Shan Zheng', serif;
+    font-size: clamp(2.8rem, 8vw, 4.5rem);
+    color: var(--red);
+    text-shadow: 0 0 40px rgba(192,57,43,0.6), 2px 2px 0 #600, 0 0 80px rgba(0,0,0,0.8);
+    letter-spacing: 0.15em;
+    line-height: 1.1;
+  }
+  .title-overlay .subtitle {
+    color: #e0c8a8;
+    font-size: 0.95rem;
+    letter-spacing: 0.3em;
+    margin-top: 10px;
+    opacity: 0.9;
+    text-shadow: 0 0 12px rgba(0,0,0,0.9);
+  }
+  .red-star {
+    color: var(--red);
+    font-size: 1.6rem;
+    display: inline-block;
+    margin: 0 8px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .passage {
+    background: linear-gradient(160deg, #1c150c 0%, #160f08 100%);
+    border: 1px solid #3a2a18;
+    border-radius: 4px;
+    padding: 32px 36px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.5s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+  .passage::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    opacity: 0.6;
+  }
+
+  .year-badge {
+    background: var(--red);
+    color: #fff;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    padding: 4px 12px;
+    display: inline-block;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+
+  .passage p {
+    color: #e2d4c2;
+    line-height: 1.9;
+    font-size: 1.05rem;
+    margin-bottom: 14px;
+    text-indent: 2em;
+  }
+  .passage p.no-indent { text-indent: 0; }
+  .passage p:last-child { margin-bottom: 0; }
+
+  .highlight {
+    color: #f3e29c;
+    font-weight: 600;
+  }
+  .mission-text {
+    color: var(--red);
+    font-weight: 600;
+    border-left: 2px solid var(--red);
+    padding-left: 12px;
+    margin: 16px 0 4px;
+    display: block;
+  }
+
+  .question-block {
+    background: #110d07;
+    border: 1px solid #2e2010;
+    border-radius: 3px;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+  .question-text {
+    color: #ecdcaa;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    margin-bottom: 0;
+    text-indent: 0 !important;
+  }
+  .question-number {
+    font-size: 0.85rem;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.9;
+  }
+
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .choice-btn {
+    background: #1a120a;
+    border: 1px solid #4a3a25;
+    color: #e8dcc8;
+    padding: 16px 22px;
+    text-align: left;
+    cursor: pointer;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .choice-btn:hover:not(:disabled) {
+    border-color: var(--gold);
+    color: #fff3e0;
+    background: #2e2014;
+    transform: translateX(4px);
+  }
+  .choice-btn:disabled {
+    cursor: default;
+  }
+  .choice-label {
+    font-weight: 700;
+    color: #e5b85c;
+    margin-right: 12px;
+    font-size: 1.05rem;
+    letter-spacing: 0.05em;
+  }
+  .choice-desc {
+    color: #c0ac8c;
+    font-size: 0.9rem;
+    display: block;
+    margin-top: 6px;
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  .feedback {
+    border-radius: 3px;
+    padding: 16px 20px;
+    margin-top: 16px;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    animation: fadeUp 0.35s ease both;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .feedback-icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .feedback-text { flex: 1; }
+  .feedback.correct {
+    background: var(--correct-bg);
+    border: 1px solid #3d8b3d;
+    color: var(--correct-text);
+  }
+  .feedback.wrong {
+    background: var(--wrong-bg);
+    border: 1px solid #b55a5a;
+    color: var(--wrong-text);
+  }
+  .feedback.info {
+    background: var(--neutral-bg);
+    border: 1px solid #3d6b8b;
+    color: var(--neutral-text);
+  }
+  .feedback.mission-good {
+    background: #1a2a3a;
+    border: 1px solid #3d8b6b;
+    color: #aae0c0;
+  }
+  .feedback.mission-bad {
+    background: #2a1a0a;
+    border: 1px solid #b57a4a;
+    color: #eab88a;
+  }
+
+  .choice-btn.selected-correct {
+    border-color: #5ba85b;
+    background: #1f2a1f;
+    color: #bae6ba;
+  }
+  .choice-btn.selected-wrong {
+    border-color: #c96a6a;
+    background: #2f1a1a;
+    color: #e6baba;
+  }
+  .choice-btn.selected-info {
+    border-color: #5a8bb5;
+    background: #1a252f;
+    color: #b8d6ff;
+  }
+  .choice-btn.revealed-right {
+    border-color: #5ba85b;
+    background: #1f2a1f;
+    color: #8bc48b;
+    opacity: 0.75;
+  }
+
+  .continue-btn {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: #f0d89c;
+    padding: 14px 32px;
+    cursor: pointer;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    border-radius: 2px;
+    margin-top: 24px;
+    transition: all 0.2s ease;
+    display: block;
+    width: 100%;
+    font-weight: 500;
+  }
+  .continue-btn:hover {
+    background: var(--gold);
+    color: #1f160c;
+  }
+
+  .score-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    background: #0e0b07;
+    border: 1px solid #3a2a1c;
+    border-radius: 3px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: #e0c8a8;
+    letter-spacing: 0.05em;
+  }
+  .score-val { color: #e5b85c; font-weight: 700; }
+
+  .phase-header {
+    text-align: center;
+    margin: 32px 0 20px;
+    animation: fadeUp 0.5s ease both;
+  }
+  .phase-title {
+    font-size: 0.85rem;
+    letter-spacing: 0.4em;
+    color: #e5b85c;
+    text-transform: uppercase;
+    opacity: 0.9;
+    margin-bottom: 8px;
+  }
+  .phase-line {
+    border: none;
+    border-top: 1px solid #4a3a28;
+    margin: 12px 0 0;
+  }
+
+  .ending-card {
+    background: linear-gradient(160deg, #1c150c 0%, #0f0a06 100%);
+    border: 1px solid #4a3a28;
+    border-radius: 4px;
+    padding: 0;
+    animation: fadeUp 0.6s ease both;
+    text-align: center;
+    overflow: hidden;
+  }
+  .ending-card .ending-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-bottom: 1px solid #4a3a28;
+  }
+  .ending-content-inner {
+    padding: 36px 36px 40px;
+  }
+  .ending-title {
+    font-family: 'Ma Shan Zheng', serif;
+    font-size: 2.2rem;
+    margin-bottom: 24px;
+    letter-spacing: 0.1em;
+  }
+  .ending-1 .ending-title { color: var(--red); text-shadow: 0 0 6px #a03020; }
+  .ending-2 .ending-title { color: #c0a070; }
+  .ending-3 .ending-title { color: #8a6e4a; }
+
+  .ending-text {
+    color: #e2d0b8;
+    line-height: 1.95;
+    font-size: 1.02rem;
+    margin-bottom: 28px;
+    text-align: left;
+  }
+  .ending-text p { text-indent: 2em; margin-bottom: 14px; }
+  .ending-text p:last-child { margin-bottom: 0; }
+
+  .debrief {
+    background: #0e0b07;
+    border: 1px solid #3a2a1c;
+    border-radius: 3px;
+    padding: 24px;
+    margin-top: 28px;
+    text-align: left;
+  }
+  .debrief-title {
+    color: #e5b85c;
+    font-size: 0.9rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    border-bottom: 1px solid #3a2a1c;
+    padding-bottom: 12px;
+  }
+  .debrief-item {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    align-items: flex-start;
+    padding: 14px;
+    border-radius: 2px;
+  }
+  .debrief-item.good { background: #0f1f0f; border-left: 3px solid #5ba85b; }
+  .debrief-item.bad { background: #1f0f0f; border-left: 3px solid #c96a6a; }
+  .debrief-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+  .debrief-content { flex: 1; }
+  .debrief-q { color: #ecdcaa; font-size: 0.96rem; font-weight: 600; margin-bottom: 6px; }
+  .debrief-a { color: #c8b28c; font-size: 0.9rem; line-height: 1.6; }
+  .debrief-a .your-choice { opacity: 0.9; }
+  .debrief-a .correct-choice { color: #9bdf9b; }
+
+  .final-score {
+    text-align: center;
+    margin-top: 32px;
+    padding: 24px;
+    border: 1px solid #4a3a28;
+    border-radius: 3px;
+  }
+  .final-score-label { color: #e0c8a8; font-size: 0.9rem; letter-spacing: 0.2em; margin-bottom: 12px; }
+  .final-score-value { color: #f0c674; font-size: 2.4rem; font-weight: 700; }
+
+  .restart-btn {
+    background: var(--red);
+    border: none;
+    color: #fff3e6;
+    padding: 16px 44px;
+    cursor: pointer;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    letter-spacing: 0.1em;
+    border-radius: 2px;
+    margin-top: 28px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+  }
+  .restart-btn:hover { background: #b54334; transform: translateY(-1px); }
+
+  .name-section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 24px;
+  }
+  .name-input {
+    background: #0e0b07;
+    border: 1px solid #4a3a28;
+    color: #f3e6d4;
+    padding: 14px 18px;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1rem;
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .name-input:focus { border-color: var(--gold); }
+  .name-input::placeholder { color: #8a765a; font-size: 0.95rem; }
+
+  .progress-dots {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 20px 0 28px;
+  }
+  .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #4a3a28;
+    transition: all 0.3s ease;
+  }
+  .dot.active { background: #e5b85c; transform: scale(1.2); }
+  .dot.done { background: var(--red); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
+  .shake { animation: shake 0.4s ease; }
+
+  .hidden { display: none !important; }
+
+  .scroll-hint {
+    text-align: center;
+    color: #6a5a48;
+    font-size: 0.8rem;
+    margin-top: 28px;
+    letter-spacing: 0.15em;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  /* mission reveal text */
+  .typewriter-text {
+    color: #f0bc9a;
+    border-left: 2px solid var(--red);
+    padding-left: 14px;
+    margin: 16px 0;
+    font-weight: 500;
+    line-height: 1.8;
+  }
+
+  .dialog-line {
+    color: #d4b896;
+    font-style: italic;
+    padding-left: 1em;
+    margin: 8px 0;
+    text-indent: 0 !important;
+  }
+
+  .mission-badge {
+    background: #8a1a1a;
+    color: #f0c8a0;
+    font-size: 0.8rem;
+    padding: 3px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+
+  .intro-passage p {
+    text-indent: 2em;
+    margin-bottom: 14px;
+  }
+
+  /* interview fail with image */
+  .fail-img-wrap {
+    position: relative;
+    margin-bottom: 20px;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .fail-img-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+    opacity: 0.5;
+  }
+  .fail-img-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    pointer-events: none;
+  }
+  .fail-text-overlay {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    text-align: center;
+    width: 85%;
+  }
+  .fail-text-overlay .fail-title {
+    font-family: 'Ma Shan Zheng', serif;
+    color: #8a4a3a;
+    font-size: 2rem;
+    text-shadow: 0 0 20px rgba(0,0,0,0.9);
+  }
+
+  @media (max-width: 550px) {
+    body {
+      font-size: 16px;
+      padding: 24px 12px 60px;
+    }
+    .passage { padding: 24px 20px; }
+    .ending-content-inner { padding: 24px 20px; }
+    .debrief { padding: 18px 14px; }
+    .choice-btn {
+      padding: 14px 18px;
+      font-size: 0.96rem;
+    }
+    .choice-desc {
+      font-size: 0.85rem;
+    }
+    .feedback {
+      padding: 14px 16px;
+      font-size: 0.9rem;
+    }
+    .question-text {
+      font-size: 1rem;
+    }
+    .passage p {
+      font-size: 1rem;
+    }
+  }
+</style>
+</head>
+<body>
+<div id="game">
+
+  <div id="screen-name" class="">
+    <div class="title-block">
+      <div class="title-img-wrap">
+        <img src="pic/1.png" alt="北平">
+        <div class="title-overlay">
+          <div><span class="red-star">★</span><span class="red-star">★</span><span class="red-star">★</span></div>
+          <h1>北·平·无·战·事</h1>
+          <div class="subtitle">一九四七 · 经济暗战 · 决胜千里</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="passage" style="text-align:center;">
+      <p style="text-indent:0; font-size:1.1rem; color:#e2d4c2;">同志，请告诉我你的名字。</p>
+      <div class="name-section">
+        <input class="name-input" id="name-input" type="text" placeholder="输入你的名字，同志：" maxlength="12">
+        <button class="continue-btn" onclick="startGame()">整装待发，进入总统府 →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-waiting" class="hidden">
+    <div class="passage" style="text-align:left;">
+      <span class="year-badge">1947年 · 南京 · 总统府</span>
+      <img src="pic/2.png" alt="会议室门口" class="scene-img">
+      <p>你坐在南京总统府内的一个会议室门口，焦急地等待着。你盯着"国家经济战略密室"几个字出了神。</p>
+      <p>大概两年前，你从苏联学习宏观经济学归来回了延安。组织上立马给你安排了任务——让你去敌占区进行地下工作。就这么几年的时间，你以优秀的经济学素质成功打入国民政府内部。</p>
+      <p>而现在，你正面临最严峻的考验：只要通过即将在这个会议室里举行的面试，你就会被接纳为国民政府经济战略委员会的核心成员。</p>
+      <p>正想着，一个西装革履的男人走了进来。你听到会议室内叫到了你的名字：</p>
+      <p style="color:#ecdcaa; text-align:center; font-size:1.1rem; margin:20px 0; text-indent:0;">「<strong id="waiting-name-placeholder">同志</strong>，到你了，快点进去吧。」</p>
+      <p>你无论如何都要得到高层的信任，回答对他们问的所有问题，这样你便能在以后的地下工作中发挥作用。</p>
+      <button class="continue-btn" onclick="enterInterviewRoom()">起身进入会议室 →</button>
+    </div>
+  </div>
+
+  <div id="screen-interview-room" class="hidden">
+    <div class="passage" style="text-align:left;">
+      <span class="year-badge">1947年 · 南京 · 会议室</span>
+      <img src="pic/3.png" alt="建丰同志" class="scene-img">
+      <p>你走进了这间朴实的会议室。你发现坐在正中间的正是国民政府内部唯一拥有真才实学的人——<strong>建丰同志</strong>，他与你同样拥有苏联留学的经历——他可并不像你之前认识的那些水货，他可能会问到你一些真正有关宏观经济的问题。</p>
+      <p class="dialog-line" style="text-indent:0; border-left:2px solid #b8860b; padding-left:14px; color:#e8d4a8; margin:18px 0;">「请坐吧，<strong id="room-name-placeholder">同志</strong>，我们正在选拔真正的经济学人才帮助我们治理经济。希望你能成为其中的一员。」建丰说道。</p>
+      <button class="continue-btn" onclick="startInterview()">接受考验吧 →</button>
+    </div>
+  </div>
+
+  <div id="screen-interview" class="hidden">
+    <div class="phase-header">
+      <div class="phase-title">第一阶段 · 面试考核</div>
+      <hr class="phase-line">
+    </div>
+    <div class="progress-dots" id="interview-dots">
+      <div class="dot active" id="dot-i0"></div>
+      <div class="dot" id="dot-i1"></div>
+      <div class="dot" id="dot-i2"></div>
+    </div>
+    <div id="interview-content"></div>
+  </div>
+
+  <div id="screen-plane" class="hidden">
+    <div class="passage" style="text-align:left;">
+      <span class="year-badge">1947年 · 飞往北平</span>
+      <img src="pic/4.png" alt="私人飞机" class="scene-img">
+      <p>不久你便被派到北平主持各类经济改革工作。建丰同志很看重你，特意用他的私人飞机送你去北平。</p>
+      <p>你望着舷窗外逐渐远去的南京城，心中默念：这场战争，才刚刚开始。</p>
+      <button class="continue-btn" onclick="enterRickshaw()">抵达北平，继续前行 →</button>
+    </div>
+  </div>
+
+  <div id="screen-rickshaw" class="hidden">
+    <div class="passage" style="text-align:left;">
+      <span class="year-badge">1947年 · 北平 · 街头</span>
+      <img src="pic/5.png" alt="黄包车接头" class="scene-img">
+      <p>当你刚下飞机走到街上的当口，一个黄包车夫说出了你们地下党员的暗号。你知道，组织要给你派新任务了。于是你坐上了他的黄包车。</p>
+      <p class="dialog-line" style="text-indent:0; border-left:2px solid #c0392b; padding-left:14px; color:#f0bc9a; margin:14px 0;">
+        「<strong id="rickshaw-name-placeholder">同志</strong>，上级给你的任务——不惜一切代价，运用你的岗位职责去破坏敌占区的经济。」
+      </p>
+      <p>车夫继续说道：「上级考虑到北平的各类文化建筑需要被保护，北平的人民也不愿经受战火。北平和平解放的唯一可能性，就落在了你的身上。我们要打一场浩浩荡荡的<strong>经济战争</strong>。」</p>
+      <p>你感到肩上的担子无比沉重——也就是说，你需要在将来的经济决策中，做出<strong class="highlight">完全错误的决策</strong>。</p>
+      <button class="continue-btn" onclick="enterMission()">开始执行任务 →</button>
+    </div>
+  </div>
+
+  <div id="screen-mission" class="hidden">
+    <div class="phase-header">
+      <div class="phase-title">第二阶段 · 经济破坏任务</div>
+      <hr class="phase-line">
+    </div>
+    <div class="progress-dots" id="mission-dots">
+      <div class="dot active" id="dot-m0"></div>
+      <div class="dot" id="dot-m1"></div>
+      <div class="dot" id="dot-m2"></div>
+    </div>
+    <div id="mission-content"></div>
+  </div>
+
+  <div id="screen-ending" class="hidden">
+    <div id="ending-content"></div>
+  </div>
+</div>
+
+<script>
+let state = {
+  name: '同志',
+  interviewQ: 0,
+  interviewCorrect: 0,
+  missionQ: 0,
+  missionCorrect: 0,
+  interviewAnswers: [],
+  missionAnswers: [],
+  canContinue: false
+};
+
+const interviewQuestions = [
+  {
+    number: '面试问题 1/3',
+    situation: '制造业失业率骤升至 14%',
+    question: '面试官问你：「我们主要考察宏观经济学理论。首先，假设我们的<span class="highlight">制造业失业率骤升至14%</span>，你有什么比较好的解决方案吗？」',
+    choices: [
+      {
+        label: 'A',
+        text: '启动大规模基建投资',
+        desc: '「应启动大规模基建投资计划。根据乘数理论，当边际消费倾向为0.7时，300亿政府支出将通过1/(1-MPC)的连锁反应激活总需求，失业率有望快速回落。」',
+        correct: true
+      },
+      {
+        label: 'B',
+        text: '削减最低工资放松劳动管制',
+        desc: '「应削减最低工资并放松劳动市场管制。价格机制具有内在弹性，只要要素市场充分自由，短期失业可通过工资调整自行消化，无需政府干预。」',
+        correct: false
+      }
+    ],
+    correctIndex: 0,
+    explanation: {
+      correct: '✓ 正确。14%的失业率属于周期性失业，根源是总需求不足。凯恩斯主义的财政刺激通过乘数效应直接扩大总支出、拉动产出，是应对短期需求冲击的经典方案。',
+      wrong: '✗ 错误。古典学派的自动均衡适用于长期和柔性价格环境。但短期内工资和价格存在粘性，削减工资反而可能进一步压缩消费需求，加剧螺旋式衰退。面试官期待的是对短期需求管理的理解。'
+    }
+  },
+  {
+    number: '面试问题 2/3',
+    situation: 'CPI同比暴涨9% + GDP萎缩1.2%',
+    question: '「假设某一地区<span class="highlight">CPI同比暴涨9%的同时GDP萎缩1.2%</span>，你会采取什么措施？」',
+    choices: [
+      {
+        label: 'A',
+        text: '财政补贴修复生产供给',
+        desc: '「当前局面源于生产端供给不足。应对关键行业实施定向财政补贴，修复供应链瓶颈。只要产能恢复，物价自然回落，产出也将回升。」',
+        correct: true
+      },
+      {
+        label: 'B',
+        text: '紧缩财政遏制过热需求',
+        desc: '「物价高涨说明需求过热。必须立即削减财政赤字、收紧支出，让AE模型中的总支出曲线下移，才能压制通胀。」',
+        correct: false
+      }
+    ],
+    correctIndex: 0,
+    explanation: {
+      correct: '✓ 正确。物价上涨伴随产出萎缩，这是供给冲击的典型特征——AS曲线左移同时推高价格、压低产出。修复供给端才能从根本上解决问题，需求管理在此场景下无法两全。',
+      wrong: '✗ 错误。需求拉动型通胀的特征是GDP增长而非萎缩。将滞胀误判为需求过热而紧缩财政，只会进一步抑制产出，GDP萎缩加剧，陷入更深的衰退。'
+    }
+  },
+  {
+    number: '面试问题 3/3',
+    situation: '企业投资对利率变化毫无反应',
+    question: '「假设我们的民族企业投资<span class="highlight">对利率变化毫无反应</span>，你会如何解决？」',
+    choices: [
+      {
+        label: 'A',
+        text: '扩大财政支出刺激总需求',
+        desc: '「货币政策传导渠道已阻塞，继续调整利率收效甚微。应转向扩大财政支出直接推高总需求，通过政府购买弥补私人投资的不足。」',
+        correct: true
+      },
+      {
+        label: 'B',
+        text: '激进加息重建央行信誉',
+        desc: '「投资对利率不敏感是因为市场主体不信任央行。应当大幅加息向市场传递反通胀决心，重新锚定预期，利率敏感性方能恢复。」',
+        correct: false
+      }
+    ],
+    correctIndex: 0,
+    explanation: {
+      correct: '✓ 正确。投资对利率无弹性意味着IS曲线近似垂直，调整LM曲线（货币政策）几乎不影响均衡产出。此时财政政策是唯一有效的需求管理手段——这正是凯恩斯流动性陷阱的核心洞见。',
+      wrong: '✗ 错误。投资对利率已无反应时，加息不仅无法"复活"利率敏感性，反而会抑制消费和其他利率敏感支出，进一步压低产出，陷入更深的衰退。'
+    }
+  }
+];
+
+const missionQuestions = [
+  {
+    number: '决策 1/3',
+    context: '建丰同志给你打了一个电话，告诉你：政府拟通过<span class="highlight">300亿财政刺激</span>挽救5%的GDP缺口（当前失业率12%）。他询问你的意见。',
+    choices: [
+      {
+        label: 'A',
+        text: '游说将资金用于军火采购',
+        desc: '「军火属于政府购买性支出，直接计入GDP的G项，乘数效应完整，能迅速拉动总需求、降低失业率，比转移支付更能精准刺激经济。」',
+        isSabotage: true
+      },
+      {
+        label: 'B',
+        text: '推动等额家庭补贴',
+        desc: '「减税降费是更市场化的手段，让企业和居民自行决定资金用途，避免政府直接配置资源的低效问题，长期更有利于经济结构调整。」',
+        isSabotage: false
+      }
+    ],
+    sabotageIndex: 0,
+    explanation: {
+      sabotage: '🔴 破坏成功。军火虽属于G项且乘数效应完整，但军事采购的结构性特征导致过度依赖债务融资，债务率突破70%红线。同时军备扩张挤压民间消费，长期埋下财政危机的隐患。',
+      notSabotage: '⚪ 任务未完成。家庭补贴通过减税路径传导，乘数效应约为 MPC/(1-MPC)≈2，低于直接G的乘数。经济温和回升，反而稳固了国民政府的统治基础。',
+      analysis: '经济学解析：直接政府支出（ΔG）的乘数为 1/(1-MPC)≈3.3；减税（ΔT）的乘数为 MPC/(1-MPC)≈2。选A乘数更大，拉动效果看似更优，但军购的单向性和债务结构的不可持续，反而制造了财政隐患。'
+    }
+  },
+  {
+    number: '决策 2/3',
+    context: '一个月后，南京方面的央行行长紧急来电：当前<span class="highlight">名义利率4%，通胀6%，实际利率为-2%</span>。他忧心忡忡地说，市场上借贷过于活跃，资金似乎正在流向投机领域而非实业。他希望听听你的意见。',
+    choices: [
+      {
+        label: 'A',
+        text: '继续降准释放流动性',
+        desc: '「央行降低存款准备金率释放基础货币，实际利率为负意味着企业融资成本极低，继续降准将进一步刺激投资和生产，有助于拉动总需求、降低失业率，是应对经济下行的有力工具。」',
+        isSabotage: true
+      },
+      {
+        label: 'B',
+        text: '公开市场出售国债回收货币',
+        desc: '「央行在公开市场大规模出售国债回笼流动性，推高市场利率。但当前实际利率为负，收紧货币可能抬升企业融资成本，短期内抑制投资活动，经济或面临下行压力。」',
+        isSabotage: false
+      }
+    ],
+    sabotageIndex: 0,
+    explanation: {
+      sabotage: '🔴 破坏成功。根据费雪方程 r = i − π，实际利率为负时借贷成本为负，借钱等于赚钱。继续降准释放廉价资金只会催生资产泡沫和过度投机，泡沫膨胀至极限后破裂，引发连锁违约和信用危机。',
+      notSabotage: '⚪ 任务未完成。公开市场出售国债回收货币使LM曲线左移，实际利率由负转正，投机成本上升，泡沫被温和挤出。紧缩虽短期有阵痛，但金融体系反而趋于稳定。',
+      analysis: '经济学解析：费雪方程 r = i − π。当r<0时，套利动机驱动资金涌入资产市场而非实业，催生泡沫。正确的政策是紧缩（出售国债）而非继续宽松。选A看似刺激经济，实则火上浇油。'
+    }
+  },
+  {
+    number: '决策 3/3',
+    context: '过了半个月之后，你在报纸上看到了消息：经济出现<span class="highlight">滞胀苗头（失业率回升至10%，通胀9%）</span>。两派官员争论激烈。',
+    choices: [
+      {
+        label: 'A',
+        text: '扩大财政赤字刺激就业',
+        desc: '「失业率高达10%，根据菲利普斯曲线，通胀与失业存在替代关系。扩大财政支出可直接创造就业岗位，失业率有望快速回落，不应让物价稳定凌驾于民生之上。」',
+        isSabotage: true
+      },
+      {
+        label: 'B',
+        text: '优先加息控制通胀',
+        desc: '「通胀已达9%远超警戒线，财政扩张只会火上浇油。央行应果断加息抑制总需求，物价稳定后才能为长期增长创造条件，短期阵痛不可避免。」',
+        isSabotage: false
+      }
+    ],
+    sabotageIndex: 0,
+    explanation: {
+      sabotage: '🔴 破坏成功。滞胀源于AS曲线左移，菲利普斯曲线已右移——通胀与失业的替代关系不复存在。此时扩大需求只会推高物价而非降低失业，触发工资-价格螺旋，经济彻底失控。',
+      notSabotage: '⚪ 任务未完成。加息控通胀虽然短期抑制GDP，但能恢复价格信号功能，引导资源重新配置，为长期增长创造条件。70年代滞胀的历史已经证明：控制通胀是恢复经济秩序的前提。',
+      analysis: '经济学解析：滞胀时菲利普斯曲线右移，传统的通胀-失业替代关系失效。扩大需求（选A）只会加剧通胀而非降低失业——这是弗里德曼和费尔普斯对菲利普斯曲线批判的核心洞见。'
+    }
+  }
+];
+
+function show(id) {
+  ['screen-name','screen-waiting','screen-interview-room','screen-interview','screen-plane','screen-rickshaw','screen-mission','screen-ending'].forEach(s => {
+    const el = document.getElementById(s);
+    if (el) el.classList.add('hidden');
+  });
+  document.getElementById(id).classList.remove('hidden');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function startGame() {
+  const input = document.getElementById('name-input');
+  const name = input.value.trim() || '同志';
+  state.name = name;
+  document.getElementById('waiting-name-placeholder').textContent = name;
+  document.getElementById('room-name-placeholder').textContent = name;
+  document.getElementById('rickshaw-name-placeholder').textContent = name;
+  show('screen-waiting');
+}
+
+function enterInterviewRoom() {
+  show('screen-interview-room');
+}
+
+function startInterview() {
+  state.interviewQ = 0;
+  state.interviewCorrect = 0;
+  state.interviewAnswers = [];
+  show('screen-interview');
+  renderInterview();
+}
+
+function enterPlane() {
+  show('screen-plane');
+}
+
+function enterRickshaw() {
+  show('screen-rickshaw');
+}
+
+function enterMission() {
+  state.missionQ = 0;
+  state.missionCorrect = 0;
+  state.missionAnswers = [];
+  show('screen-mission');
+  renderMission();
+}
+
+function renderInterview() {
+  const q = interviewQuestions[state.interviewQ];
+  if (!q) {
+    if (state.interviewCorrect === 3) {
+      enterPlane();
+    } else {
+      showInterviewFail();
+    }
+    return;
+  }
+
+  updateDots('interview-dots', state.interviewQ, 3);
+
+  const el = document.getElementById('interview-content');
+
+  el.innerHTML = `
+    <div class="passage" style="animation-delay:0s">
+      <div class="question-number">${q.number}</div>
+      <div class="question-block">
+        <p class="question-text">${q.question}</p>
+      </div>
+    </div>
+    <div class="choices" id="choices-container">
+      ${q.choices.map((c, i) => `
+        <button class="choice-btn" id="choice-${i}" onclick="answerInterview(${i})">
+          <span class="choice-label">${c.label}</span>${c.text}
+          <span class="choice-desc">${c.desc}</span>
+        </button>
+      `).join('')}
+    </div>
+    <div id="feedback-area"></div>
+  `;
+}
+
+function answerInterview(chosen) {
+  const q = interviewQuestions[state.interviewQ];
+  const isCorrect = q.choices[chosen].correct;
+
+  state.interviewAnswers.push({ q: state.interviewQ, chosen, correct: isCorrect });
+  if (isCorrect) state.interviewCorrect++;
+
+  q.choices.forEach((_, i) => {
+    const btn = document.getElementById(`choice-${i}`);
+    btn.disabled = true;
+    if (i === chosen) {
+      btn.classList.add(isCorrect ? 'selected-correct' : 'selected-wrong');
+    } else if (q.choices[i].correct) {
+      btn.classList.add('revealed-right');
+    }
+  });
+
+  const fb = document.getElementById('feedback-area');
+  const explanation = isCorrect ? q.explanation.correct : q.explanation.wrong;
+  const cls = isCorrect ? 'correct' : 'wrong';
+  const icon = isCorrect ? '✓' : '✗';
+
+  fb.innerHTML = `
+    <div class="feedback ${cls}" style="margin-top:12px">
+      <span class="feedback-icon">${icon}</span>
+      <span class="feedback-text">${explanation}</span>
+    </div>
+    <button class="continue-btn" onclick="nextInterview()">${
+      state.interviewQ < 2 ? '继续作答 →' : '面试结束，查看结果 →'
+    }</button>
+  `;
+  if (!isCorrect) fb.querySelector('.feedback').classList.add('shake');
+}
+
+function nextInterview() {
+  state.interviewQ++;
+  if (state.interviewQ >= 3) {
+    if (state.interviewCorrect < 3) {
+      showInterviewFail();
+    } else {
+      enterPlane();
+    }
+  } else {
+    renderInterview();
+  }
+}
+
+function showInterviewFail() {
+  show('screen-ending');
+  const wrongCount = state.interviewAnswers.filter(a => !a.correct).length;
+  const firstWrongIndex = state.interviewAnswers.findIndex(a => !a.correct);
+  const wrongQNum = firstWrongIndex >= 0 ? firstWrongIndex + 1 : 1;
+
+  document.getElementById('ending-content').innerHTML = `
+    <div class="ending-card ending-3">
+      <div class="fail-img-wrap">
+        <img src="pic/3.png" alt="面试失败" style="width:100%;height:auto;display:block;opacity:0.5;">
+        <div class="fail-text-overlay">
+          <div class="fail-title">面试落败</div>
+        </div>
+      </div>
+      <div class="ending-content-inner">
+        <p class="ending-text">
+          面试官们面面相觑，建丰同志更是面色铁青。他们交头接耳地讨论了一会，然后冷冷地告诉你：
+        </p>
+        <p class="ending-text" style="border-left:2px solid #b57a4a; padding-left:12px; color:#d0ac80;">
+          「<strong>${state.name}</strong>，很遗憾，第${wrongQNum}个问题你就没有回答正确。」
+        </p>
+        <p class="ending-text" style="color:#c0a070;">你被请出了会场。离开的时候只听见他们说：</p>
+        <p class="ending-text" style="color:#aa9a7a;">「国家怎么培养出了像${state.name}这种没用的人才……」</p>
+        <p class="ending-text" style="color:#aa9a7a; font-size:0.9rem; margin-top:12px;">你决心回到革命根据地，重新研习宏观经济学。</p>
+
+        <div class="debrief">
+          <div class="debrief-title">面试复盘</div>
+          ${renderInterviewDebrief()}
+        </div>
+
+        <button class="restart-btn" onclick="restartGame()">重新开始</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderInterviewDebrief() {
+  return state.interviewAnswers.map(a => {
+    const q = interviewQuestions[a.q];
+    const chosenText = q.choices[a.chosen].text;
+    const correctText = q.choices[q.correctIndex].text;
+    const cls = a.correct ? 'good' : 'bad';
+    const icon = a.correct ? '✓' : '✗';
+    return `
+      <div class="debrief-item ${cls}">
+        <span class="debrief-icon">${icon}</span>
+        <div class="debrief-content">
+          <div class="debrief-q">${q.number}：${q.situation}</div>
+          <div class="debrief-a">
+            <span class="your-choice">你的选择：${chosenText}</span>
+            ${!a.correct ? `<br><span class="correct-choice">正确答案：${correctText}</span>` : ''}
+            <br><span style="color:#b6a07e; font-size:0.85em">${a.correct ? q.explanation.correct : q.explanation.wrong}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderMission() {
+  const q = missionQuestions[state.missionQ];
+  if (!q) {
+    showEnding();
+    return;
+  }
+
+  updateDots('mission-dots', state.missionQ, 3);
+
+  const el = document.getElementById('mission-content');
+
+  let imgHtml = '';
+  if (state.missionQ === 0) {
+    imgHtml = '<img src="pic/6.png" alt="工作场景" class="scene-img">';
+  } else if (state.missionQ === 1) {
+    imgHtml = '<img src="pic/7.png" alt="北平经济动荡" class="scene-img">';
+  }
+
+  el.innerHTML = `
+    <div class="passage" style="animation-delay:0s">
+      ${imgHtml}
+      <div class="question-number">${q.number}</div>
+      <div class="question-block">
+        <p class="question-text">${q.context}</p>
+      </div>
+    </div>
+    <div class="choices" id="choices-container">
+      ${q.choices.map((c, i) => `
+        <button class="choice-btn" id="mchoice-${i}" onclick="answerMission(${i})">
+          <span class="choice-label">${c.label}</span>${c.text}
+          <span class="choice-desc">${c.desc}</span>
+        </button>
+      `).join('')}
+    </div>
+    <div id="mfeedback-area"></div>
+  `;
+}
+
+function answerMission(chosen) {
+  const q = missionQuestions[state.missionQ];
+  const isSabotage = q.choices[chosen].isSabotage;
+
+  state.missionAnswers.push({ q: state.missionQ, chosen, sabotage: isSabotage });
+  if (isSabotage) state.missionCorrect++;
+
+  q.choices.forEach((_, i) => {
+    const btn = document.getElementById(`mchoice-${i}`);
+    btn.disabled = true;
+    if (i === chosen) {
+      btn.classList.add(isSabotage ? 'selected-correct' : 'selected-info');
+    } else if (q.choices[i].isSabotage) {
+      btn.classList.add('revealed-right');
+    }
+  });
+
+  const fb = document.getElementById('mfeedback-area');
+  const explanation = isSabotage ? q.explanation.sabotage : q.explanation.notSabotage;
+  const cls = isSabotage ? 'mission-good' : 'mission-bad';
+  const icon = isSabotage ? '🔴' : '⚪';
+
+  fb.innerHTML = `
+    <div class="feedback ${cls}" style="margin-top:12px">
+      <span class="feedback-icon">${icon}</span>
+      <div class="feedback-text">
+        <div style="margin-bottom:6px">${explanation}</div>
+        <div style="font-size:0.88em; opacity:0.8; border-top:1px solid rgba(255,255,255,0.1); padding-top:6px; margin-top:6px">${q.explanation.analysis}</div>
+      </div>
+    </div>
+    <button class="continue-btn" onclick="nextMission()">${
+      state.missionQ < 2 ? '继续执行任务 →' : '查看最终结局 →'
+    }</button>
+  `;
+}
+
+function nextMission() {
+  state.missionQ++;
+  if (state.missionQ >= 3) {
+    showEnding();
+  } else {
+    renderMission();
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+}
+
+function showEnding() {
+  show('screen-ending');
+  const sc = state.missionCorrect;
+  const name = state.name;
+
+  let endingClass, endingTitle, endingText, endingImg;
+
+  if (sc === 3) {
+    endingClass = 'ending-1';
+    endingTitle = '结局一：北平无战事';
+    endingImg = 'pic/8.png';
+    endingText = `
+      <p>通过一系列决策，你让国民政府的财政状况与北平的经济状况乱成一团。民众希望国民政府下台的呼声越来越高，国民政府高官连连携款坐飞机逃跑。</p>
+      <p>傅作义将军站在将帅庙前，望着那座千年古城。1949年1月，他在人民的呼声中最终选择了投降。</p>
+      <p>你看着北平依旧安静美丽的街道，不觉露出了笑容。那些宫殿、胡同、城墙——都完好无损。</p>
+      <p style="color:#c0392b; font-weight:600; margin-top:12px; text-align:center; text-indent:0;">★ 北平无战事 ★</p>
+    `;
+  } else if (sc === 2) {
+    endingClass = 'ending-2';
+    endingTitle = '结局二：功亏一篑';
+    endingImg = 'pic/9.png';
+    endingText = `
+      <p>通过一系列决策，你让国民政府的财政状况与北平的经济状况产生了一些问题，但尚未达到临界点。</p>
+      <p>建丰同志不久便通过安插眼线的方式发现了你的异常举动。就算国民政府高官连连携款坐飞机逃跑的时候，你还是被中统的人抓进了牢里。</p>
+      <p>他们日夜折磨你。你倒在了解放的前夕，没能亲眼看见那一天的到来。</p>
+    `;
+  } else if (sc === 1) {
+    endingClass = 'ending-2';
+    endingTitle = '结局三：暴露身份';
+    endingImg = 'pic/10.png';
+    endingText = `
+      <p>通过一系列决策，你让国民政府的财政状况与北平的经济状况产生了一些问题，但建丰同志很快就注意到了你的"失常"。</p>
+      <p>中统的眼线将你的一举一动汇报给了上级。在你家中，特务破门而入。</p>
+      <p>审讯室里，他们问你为什么做了那些决定。你沉默不语。这份沉默，成了你最后的尊严。</p>
+    `;
+  } else {
+    endingClass = 'ending-3';
+    endingTitle = '结局四：碌碌无为';
+    endingImg = 'pic/11.png';
+    endingText = `
+      <p>你所有的决策都符合教科书标准，国民政府的财政状况与北平的经济状况几乎没有产生任何问题。</p>
+      <p>那位拉黄包车的同志对你失望至极：</p>
+      <p style="border-left:2px solid #b57a4a; padding-left:12px; color:#d0ac80; text-indent:0;">「你掐灭了和平解放北平最后的希望。」</p>
+      <p>由于你屡次"异常配合"，组织不得不与你频繁接触，最终全部暴露。你想到自己可能会因为经受不住酷刑而招供，于是你毅然咬舌自尽，满口鲜血地倒在了自己家中。</p>
+    `;
+  }
+
+  document.getElementById('ending-content').innerHTML = `
+    <div class="ending-card ${endingClass}">
+      <img src="${endingImg}" alt="${endingTitle}" class="ending-img">
+      <div class="ending-content-inner">
+        <div class="ending-title">${endingTitle}</div>
+        <div class="ending-text">${endingText}</div>
+
+        <div class="final-score">
+          <div class="final-score-label">任务完成度</div>
+          <div class="final-score-value">${sc} / 3</div>
+          <div style="color:#b89a70; font-size:0.85rem; margin-top:8px">面试成绩：${state.interviewCorrect}/3 &nbsp;|&nbsp; 破坏任务：${sc}/3</div>
+        </div>
+
+        ${renderFullDebrief()}
+
+        <button class="restart-btn" onclick="restartGame()">再来一次</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderFullDebrief() {
+  const iItems = state.interviewAnswers.map(a => {
+    const q = interviewQuestions[a.q];
+    const chosenText = q.choices[a.chosen].text;
+    const correctText = q.choices[q.correctIndex].text;
+    const cls = a.correct ? 'good' : 'bad';
+    return `
+      <div class="debrief-item ${cls}">
+        <span class="debrief-icon">${a.correct ? '✓' : '✗'}</span>
+        <div class="debrief-content">
+          <div class="debrief-q">${q.number}：${q.situation}</div>
+          <div class="debrief-a">
+            <span class="your-choice">你的选择：${chosenText}</span>
+            ${!a.correct ? `<br><span class="correct-choice">✓ 正确答案：${correctText}</span>` : ''}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  const mItems = state.missionAnswers.map(a => {
+    const q = missionQuestions[a.q];
+    const chosenText = q.choices[a.chosen].text;
+    const sabotageText = q.choices[q.sabotageIndex].text;
+    const cls = a.sabotage ? 'good' : 'bad';
+    return `
+      <div class="debrief-item ${cls}">
+        <span class="debrief-icon">${a.sabotage ? '🔴' : '⚪'}</span>
+        <div class="debrief-content">
+          <div class="debrief-q">${q.number}</div>
+          <div class="debrief-a">
+            <span class="your-choice">你的选择：${chosenText}</span>
+            ${!a.sabotage ? `<br><span class="correct-choice">🔴 破坏方案：${sabotageText}</span>` : ''}
+            <br><span style="color:#aa8e66; font-size:0.85em">${a.sabotage ? q.explanation.sabotage : q.explanation.notSabotage}</span>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="debrief" style="margin-top:32px; text-align:left">
+      <div class="debrief-title">完整复盘 · 面试阶段</div>
+      ${iItems}
+    </div>
+    <div class="debrief" style="margin-top:16px; text-align:left">
+      <div class="debrief-title">完整复盘 · 任务阶段</div>
+      <div style="font-size:0.85rem; color:#bc9a6a; margin-bottom:14px; padding: 10px; background:#0a0806; border-radius:2px">
+        提示：任务阶段中，<span style="color:#c96a5a">红色选项</span>为破坏方案（正确执行任务），<span style="color:#b8aa90">浅色选项</span>为经济学上更合理但不利于任务的选择。
+      </div>
+      ${mItems}
+    </div>
+  `;
+}
+
+function updateDots(containerId, current, total) {
+  for (let i = 0; i < total; i++) {
+    const prefix = containerId.includes('interview') ? 'dot-i' : 'dot-m';
+    const dot = document.getElementById(prefix + i);
+    if (!dot) continue;
+    dot.className = 'dot';
+    if (i < current) dot.classList.add('done');
+    else if (i === current) dot.classList.add('active');
+  }
+}
+
+function restartGame() {
+  state = {
+    name: '同志',
+    interviewQ: 0,
+    interviewCorrect: 0,
+    missionQ: 0,
+    missionCorrect: 0,
+    interviewAnswers: [],
+    missionAnswers: [],
+  };
+  document.getElementById('waiting-name-placeholder').textContent = '同志';
+  document.getElementById('room-name-placeholder').textContent = '同志';
+  document.getElementById('rickshaw-name-placeholder').textContent = '同志';
+  document.getElementById('name-input').value = '';
+  for (let i = 0; i < 3; i++) {
+    const di = document.getElementById('dot-i' + i);
+    const dm = document.getElementById('dot-m' + i);
+    if (di) { di.className = 'dot'; if(i===0) di.classList.add('active'); }
+    if (dm) { dm.className = 'dot'; if(i===0) dm.classList.add('active'); }
+  }
+  show('screen-name');
+}
+
+document.getElementById('name-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') startGame();
+});
+</script>
+</body>
+</html>
