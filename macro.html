@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宏观经济学B 复习题库</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>宏观经济学B 复习题库</h1>
+  <p>华中农业大学 · 期末复习备考</p>
+</header>
+
+<main>
+  <div class="grid" id="grid"></div>
+</main>
+
+<footer>
+  <p>题目来源：高鸿业教材习题 · 马工程配套题库 · 高等农林教材习题</p>
+</footer>
+
+<script src="data/question-data.js"></script>
+<script>
+const chapters = [
+  { id: "ch01", title: "宏观经济学导论" },
+  { id: "ch02", title: "国民收入核算理论" },
+  { id: "ch03", title: "简单国民收入的决定（AE-NI模型）" },
+  { id: "ch04", title: "产品市场和货币市场的一般均衡（IS-LM模型）" },
+  { id: "ch05", title: "总供给-总需求的一般均衡（AD-AS模型）" },
+  { id: "ch06", title: "开放市场的一般均衡（IS-LM-BP模型）" },
+  { id: "ch07", title: "宏观经济政策" },
+  { id: "ch08", title: "失业与通胀" },
+  { id: "ch09", title: "经济增长理论" },
+  { id: "ch10", title: "经济周期理论" },
+  { id: "ch11", title: "宏观经济学的微观基础" },
+  { id: "ch12", title: "新古典主义与新凯恩斯主义" }
+];
+
+const grid = document.getElementById("grid");
+const typeLabels = { "名词解释": "名词", "单项选择题": "单选", "计算题": "计算", "简述题": "简述", "论述题": "论述" };
+
+chapters.forEach(ch => {
+  const data = QUESTION_DATA[ch.id];
+  if (!data) return;
+
+  const card = document.createElement("a");
+  card.className = "card";
+  card.href = `chapter.html?id=${ch.id}`;
+
+  let tags = "";
+  data.sections.forEach(s => {
+    const label = typeLabels[s.type] || s.type;
+    tags += `<span class="tag">${label} ${s.questions.length}</span> `;
+  });
+
+  card.innerHTML = `
+    <div class="card-number">第${data.id.slice(2)}章</div>
+    <div class="card-title">${ch.title}</div>
+    <div class="card-stats">共 ${data.totalQuestions} 题</div>
+    <div class="card-tags">${tags}</div>
+  `;
+  grid.appendChild(card);
+});
+</script>
+</body>
+</html>

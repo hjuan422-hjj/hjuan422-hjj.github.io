@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宏观经济学B 复习题库</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a href="index.html" class="back-link">&larr; 返回章节列表</a>
+  <h1 id="chapter-title">加载中...</h1>
+</header>
+
+<main>
+  <div class="tabs" id="tabs"></div>
+  <div id="questions-container"></div>
+</main>
+
+<script src="data/question-data.js"></script>
+<script>
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  const chapterId = params.get("id") || "ch01";
+
+  const chapterTitle = document.getElementById("chapter-title");
+  const tabsEl = document.getElementById("tabs");
+  const container = document.getElementById("questions-container");
+
+  const data = QUESTION_DATA[chapterId];
+  if (!data) {
+    chapterTitle.textContent = "章节未找到";
+    container.innerHTML = '<div class="empty-state">请从首页选择有效章节</div>';
+    return;
+  }
+
+  chapterTitle.textContent = `第${data.id.slice(2)}章 ${data.title}`;
+  const sections = data.sections;
+
+  if (sections.length === 0) {
+    container.innerHTML = '<div class="empty-state">本章暂无题目</div>';
+    return;
+  }
+
+  sections.forEach(s => {
+    const btn = document.createElement("button");
+    btn.className = "tab-btn";
+    btn.textContent = `${s.type} (${s.questions.length})`;
+    btn.dataset.type = s.type;
+    btn.addEventListener("click", () => switchSection(s.type));
+    tabsEl.appendChild(btn);
+  });
+
+  const first = sections.find(s => s.questions.length > 0) || sections[0];
+  switchSection(first.type);
+
+  function switchSection(type) {
+    document.querySelectorAll(".tab-btn").forEach(b => {
+      b.classList.toggle("active", b.dataset.type === type);
+    });
+
+    const section = sections.find(s => s.type === type);
+    if (!section || section.questions.length === 0) {
+      container.innerHTML = '<div class="empty-state">本章无此题型题目</div>';
+      return;
+    }
+
+    container.innerHTML = "";
+    section.questions.forEach(q => {
+      const card = document.createElement("div");
+      card.className = "question-card";
+
+      const textDiv = document.createElement("div");
+      textDiv.className = "question-text";
+      textDiv.textContent = q.text;
+      card.appendChild(textDiv);
+
+      const btn = document.createElement("button");
+      btn.className = "answer-btn";
+      btn.textContent = "显示答案";
+      btn.addEventListener("click", () => {
+        const isRevealed = btn.classList.toggle("revealed");
+        btn.textContent = isRevealed ? "隐藏答案" : "显示答案";
+        ansEl.classList.toggle("visible", isRevealed);
+      });
+      card.appendChild(btn);
+
+      const ansEl = document.createElement("div");
+      ansEl.className = "answer-content";
+      ansEl.textContent = q.answer || "（本题无答案）";
+      card.appendChild(ansEl);
+
+      container.appendChild(card);
+    });
+  }
+})();
+</script>
+</body>
+</html>
